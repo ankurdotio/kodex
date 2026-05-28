@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import userModel from './models/users.model.js';
 import cookies from 'cookie-parser';
 import jwt from 'jsonwebtoken';
+import { authMiddleware } from './middleware/auth.middleware.js';
 
 
 const app = express();
@@ -17,7 +18,7 @@ app.use(cookies());
  * @access Public
  */
 app.post("/api/auth/register", async (req, res) => {
-    const { name, email } = req.body;
+    const { name, email, password } = req.body;
 
     // ---- Validation ----
     if (!name) {
@@ -28,8 +29,16 @@ app.post("/api/auth/register", async (req, res) => {
         return res.status(400).json({ error: "Email is required" });
     }
 
+    if (!password) {
+        return res.status(400).json({ error: "Password is required" });
+    }
+
     if (name.trim().length < 3) {
         return res.status(400).json({ error: "Name must be at least 3 characters long" });
+    }
+
+    if (password.trim().length < 6) {
+        return res.status(400).json({ error: "Password must be at least 6 characters long" });
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -39,7 +48,7 @@ app.post("/api/auth/register", async (req, res) => {
 
     // ---- If validation passes, create the user ----
 
-    const newUser = await userModel.create({ name, email });
+    const newUser = await userModel.create({ name, email, password });
 
 
     const token = jwt.sign(
@@ -58,19 +67,67 @@ app.post("/api/auth/register", async (req, res) => {
 })
 
 
+/**
+ * @route POST /api/auth/login
+ * @description Login a user need email and password in the request body
+ * @access Public
+ */
+app.post("/api/auth/login", async (req, res) => {
+    const { email, password } = req.body;
+
+    // ---- Validation ----
+    if (!email) {
+        return res.status(400).json({ error: "Email is required" });
+    }
+
+    if (!password) {
+        return res.status(400).json({ error: "Password is required" });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email)) {
+        return res.status(400).json({ error: "Invalid email format" });
+    }
+
+    if (password.trim().length < 6) {
+        return res.status(400).json({ error: "Password must be at least 6 characters long" });
+    }
+
+    // ---- If validation passes, check if the user exists ----
+
+    const user = await userModel.findOne({ email });
+
+    if (!user) {
+        return res.status(404).json({ error: "User not found" });
+    }
+
+    if (!(await user.matchPassword(password))) {
+        return res.status(401).json({ error: "Invalid credentials" });
+    }
+
+    const token = jwt.sign(
+        { id: user._id, email: user.email },
+        process.env.JWT_SECRET);
+
+    res.cookie("token", token)
+
+    return res.status(200).json({
+        message: "User logged in successfully",
+        user
+    });
+
+})
+
 
 /**
  * @route POST /api/notes
  * @description Create a new note need title and description in the request body
  * @access Public
  */
-app.post("/api/notes", async (req, res) => {
+app.post("/api/notes", authMiddleware, async (req, res) => {
     const { title, description } = req.body;
 
-    const token = req.cookies.token;
-    const user = jwt.verify(token, process.env.JWT_SECRET);
-
-    req.user = user; // { id: "user_id", email: "user_email" }
 
     // ---- Validation ----
     if (!title) {
@@ -109,12 +166,8 @@ app.post("/api/notes", async (req, res) => {
  * @description Get all notes
  * @access Public
  */
-app.get("/api/notes", async (req, res) => {
+app.get("/api/notes", authMiddleware, async (req, res) => {
 
-    const token = req.cookies.token;
-    const user = JSON.parse(token);
-
-    req.user = user; // { id: "user_id", email: "user_email" }
 
     const notes = await NoteModel.find({
         user: req.user.email
@@ -133,10 +186,10 @@ app.get("/api/notes", async (req, res) => {
  * @description Update a note by id require description in the request body
  * @access Public
  */
-
-app.patch("/api/notes/:id", async (req, res) => {
+app.patch("/api/notes/:id", authMiddleware, async (req, res) => {
     const { id } = req.params;
     const { description } = req.body;
+
 
     // ---- Validation ----
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -151,7 +204,10 @@ app.patch("/api/notes/:id", async (req, res) => {
         return res.status(400).json({ error: "Description must be at least 10 characters long" });
     }
 
-    const note = await NoteModel.findById(id);
+    const note = await NoteModel.findOne({
+        _id: id,
+        user: req.user.email
+    });
 
     if (!note) {
         return res.status(404).json({ error: "Note not found" });
@@ -172,9 +228,10 @@ app.patch("/api/notes/:id", async (req, res) => {
  * @description Delete a note by id
  * @access Public
  */
-app.delete("/api/notes/:id", async (req, res) => {
+app.delete("/api/notes/:id", authMiddleware, async (req, res) => {
 
     const { id } = req.params;
+
 
     // ---- Check if id is valid mongoose ObjectId ----
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -182,7 +239,10 @@ app.delete("/api/notes/:id", async (req, res) => {
     }
 
     // ---- Check if the note exists ----
-    const note = await NoteModel.findById(id);
+    const note = await NoteModel.findOne({
+        _id: id,
+        user: req.user.email
+    });
 
     if (!note) {
         return res.status(404).json({ error: "Note not found" });
