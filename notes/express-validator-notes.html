@@ -1,0 +1,1775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>express-validator — Sheryians Coding School</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Fraunces:ital,wght@0,300;0,600;0,700;0,900;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:       #0E0F14;
+    --paper:     #F5F2EB;
+    --paper2:    #EDE9DF;
+    --paper3:    #E4DFD3;
+    --rule:      #D4CEBC;
+    --muted:     #6B6455;
+    --accent:    #C84B1F;
+    --accent2:   #1A6B4A;
+    --accent3:   #1B4587;
+    --gold:      #B8860B;
+    --code-bg:   #1A1C24;
+    --code-text: #E2DCCC;
+    --flag-c:    #5BA4CF;
+    --val-c:     #F4A261;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  /* ── Layout ── */
+  .layout { display: flex; min-height: 100vh; }
+
+  nav {
+    width: 260px;
+    flex-shrink: 0;
+    background: var(--ink);
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 32px 0 40px;
+  }
+
+  nav::-webkit-scrollbar { width: 4px; }
+  nav::-webkit-scrollbar-track { background: transparent; }
+  nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+
+  main {
+    flex: 1;
+    max-width: calc(99% - 256px);
+    padding: 56px 56px 80px;
+  }
+
+  /* ── Nav Brand ── */
+  .nav-brand { padding: 0 24px 28px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 16px; }
+  .nav-brand .logo { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 700; color: white; letter-spacing: -0.01em; }
+  .nav-brand .logo span { color: var(--accent); }
+  .nav-brand .sub { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: rgba(255,255,255,0.35); letter-spacing: 0.06em; margin-top: 4px; }
+
+  /* ── Nav Links ── */
+  .nav-group-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    color: rgba(255,255,255,0.25);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 14px 24px 6px;
+  }
+
+  nav a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 24px;
+    text-decoration: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12.5px;
+    color: rgba(255,255,255,0.5);
+    border-left: 2px solid transparent;
+    transition: all 0.15s;
+  }
+
+  nav a:hover { color: white; background: rgba(255,255,255,0.04); }
+  nav a.active { color: white; border-left-color: var(--accent); background: rgba(200,75,31,0.08); }
+
+  .nav-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 4px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+
+  nav a:hover .nav-num, nav a.active .nav-num { background: var(--accent); color: white; }
+
+  /* ── Sections ── */
+  .section {
+    margin-bottom: 72px;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .section:nth-child(2) { animation-delay: 0.05s; }
+  .section:nth-child(3) { animation-delay: 0.10s; }
+  .section:nth-child(4) { animation-delay: 0.15s; }
+  .section:nth-child(5) { animation-delay: 0.20s; }
+  .section:nth-child(6) { animation-delay: 0.25s; }
+  .section:nth-child(7) { animation-delay: 0.30s; }
+  .section:nth-child(8) { animation-delay: 0.35s; }
+
+  .section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 28px;
+  }
+
+  .section-num-big {
+    font-family: 'Fraunces', serif;
+    font-size: 48px;
+    font-weight: 900;
+    color: var(--rule);
+    line-height: 1;
+    user-select: none;
+    flex-shrink: 0;
+  }
+
+  .section-title {
+    font-family: 'Fraunces', serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+
+  .section-subtitle {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 5px;
+  }
+
+  /* ── Hero ── */
+  .hero {
+    padding-bottom: 64px;
+    margin-bottom: 40px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .hero-eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 16px;
+  }
+
+  .hero h1 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(36px, 5vw, 58px);
+    font-weight: 900;
+    color: var(--ink);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 20px;
+  }
+
+  .hero h1 em { font-style: italic; color: var(--accent); }
+
+  .hero-desc {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--muted);
+    max-width: 560px;
+    line-height: 1.65;
+    margin-bottom: 20px;
+  }
+
+  .hero-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .hero-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    border: 1px solid var(--rule);
+    border-radius: 20px;
+    padding: 4px 12px;
+  }
+
+  /* ── Typography ── */
+  h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 28px 0 12px;
+  }
+
+  h4 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 20px 0 8px;
+  }
+
+  p {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14.5px;
+    color: #2A2720;
+    line-height: 1.7;
+    margin-bottom: 12px;
+  }
+
+  code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    background: var(--paper3);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 1px 5px;
+  }
+
+  /* ── Concept Box ── */
+  .concept {
+    background: var(--paper2);
+    border-left: 3px solid var(--accent3);
+    border-radius: 0 8px 8px 0;
+    padding: 16px 20px;
+    margin: 16px 0;
+  }
+
+  .concept-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    color: var(--accent3);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 8px;
+  }
+
+  .concept p {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    line-height: 1.65;
+    margin: 0;
+  }
+
+  /* ── Note / Warn ── */
+  .note, .warn {
+    display: flex;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 8px;
+    margin: 16px 0;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .note { background: #FEF9EC; border: 1px solid #EDD97A; color: #5C4A00; }
+  .note strong { color: #3D3000; }
+  .warn { background: #FEF2F2; border: 1px solid #FCA5A5; color: #7F1D1D; }
+  .note-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .note p, .warn p { font-size: 13px; margin: 0; color: inherit; line-height: 1.6; }
+
+  /* ── Step Label ── */
+  .step-label {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    color: white;
+    background: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 3px 10px;
+    border-radius: 4px;
+    margin: 16px 0 10px;
+  }
+
+  .step-label.green  { background: var(--accent2); }
+  .step-label.blue   { background: var(--accent3); }
+  .step-label.gold   { background: var(--gold); }
+
+  /* ── Code Block ── */
+  .code-wrap {
+    background: var(--code-bg);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 16px 0;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    background: rgba(255,255,255,0.03);
+  }
+
+  .code-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: rgba(255,255,255,0.35);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .copy-btn {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: rgba(255,255,255,0.3);
+    background: none;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 4px;
+    padding: 2px 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .copy-btn:hover { color: white; border-color: rgba(255,255,255,0.25); }
+  .copy-btn.copied { color: #87CEAB; border-color: #87CEAB; }
+
+  pre {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--code-text);
+    padding: 18px 20px;
+    overflow-x: auto;
+    line-height: 1.7;
+    tab-size: 2;
+  }
+
+  .c-cmd     { color: #87CEEB; font-weight: bold; }
+  .c-flag    { color: #5BA4CF; }
+  .c-val     { color: #F4A261; }
+  .c-str     { color: #98C379; }
+  .c-comment { color: rgba(255,255,255,0.28); font-style: italic; }
+  .c-key     { color: #C678DD; }
+  .c-pipe    { color: #E5C07B; }
+  .c-kw      { color: #E06C75; }
+  .c-fn      { color: #61AFEF; }
+  .c-num     { color: #D19A66; }
+
+  /* ── Flag Table ── */
+  .flag-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 13px;
+  }
+
+  .flag-table th {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    background: var(--paper3);
+    padding: 8px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .flag-table td { padding: 9px 14px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  .flag-table tr:last-child td { border-bottom: none; }
+  .flag-table tr:hover td { background: var(--paper2); }
+
+  .f-name { font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: var(--flag-c); }
+  .f-val  { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--val-c); }
+  .f-desc { font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--ink); }
+  .f-why  { font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--muted); }
+
+  /* ── Compare Table ── */
+  .compare {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--rule);
+  }
+
+  .compare thead tr { background: var(--ink); }
+  .compare th { color: white; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; padding: 12px 16px; text-align: left; }
+  .compare td { padding: 11px 16px; border-bottom: 1px solid var(--rule); font-size: 13.5px; }
+  .compare tr:last-child td { border-bottom: none; }
+  .compare tr:hover td { background: var(--paper2); }
+  .compare .row-label { font-size: 13px; font-weight: 600; color: var(--ink); }
+  .compare .local-val { color: var(--muted); }
+  .compare .eks-val   { color: var(--accent2); font-weight: 500; }
+
+  /* ── Flow ── */
+  .flow { margin: 16px 0; }
+
+  .flow-step { display: flex; gap: 16px; }
+
+  .flow-line {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .flow-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+    margin-top: 5px;
+  }
+
+  .flow-connector {
+    width: 2px;
+    flex: 1;
+    background: var(--rule);
+    min-height: 24px;
+    margin: 4px 0;
+  }
+
+  .flow-content { padding-bottom: 20px; }
+  .flow-title  { font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; color: var(--ink); }
+  .flow-detail { font-family: 'DM Sans', sans-serif; font-size: 12.5px; color: var(--muted); margin-top: 3px; }
+
+  /* ── Scale Diagram ── */
+  .scale-diagram {
+    background: var(--paper2);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 20px 24px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    line-height: 2;
+    color: var(--muted);
+    margin: 16px 0;
+  }
+
+  .scale-diagram .hi    { color: var(--ink); font-weight: bold; }
+  .scale-diagram .green { color: var(--accent2); }
+  .scale-diagram .red   { color: var(--accent); }
+
+  /* ── Divider ── */
+  hr.divider { border: none; border-top: 1px solid var(--rule); margin: 40px 0; }
+
+  /* ── Footer ── */
+  footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0 0;
+    border-top: 2px solid var(--rule);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* ── Validator Method Grid ── */
+  .method-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+  }
+
+  .method-card {
+    background: var(--paper2);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+
+  .method-card .method-name {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent3);
+    margin-bottom: 5px;
+  }
+
+  .method-card .method-desc {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* ── Inline ul/li ── */
+  ul { margin: 10px 0 14px 20px; }
+  ul li { font-family: 'DM Sans', sans-serif; font-size: 14px; color: #2A2720; line-height: 1.7; margin-bottom: 4px; }
+
+  @media (max-width: 768px) {
+    nav { display: none; }
+    main { padding: 32px 24px 60px; max-width: 100%; }
+    footer { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+<!-- ───────────────────── SIDEBAR ───────────────────── -->
+<nav>
+  <div class="nav-brand">
+    <div class="logo">express<span>-</span>validator</div>
+    <div class="sub">Sheryians Coding School</div>
+  </div>
+
+  <div class="nav-group-label">Getting Started</div>
+  <a href="#intro" class="active"><span class="nav-num">1</span> Introduction</a>
+  <a href="#setup"><span class="nav-num">2</span> Installation & Setup</a>
+
+  <div class="nav-group-label">Core API</div>
+  <a href="#check"><span class="nav-num">3</span> check() & body()</a>
+  <a href="#validators"><span class="nav-num">4</span> Built-in Validators</a>
+  <a href="#sanitizers"><span class="nav-num">5</span> Sanitizers</a>
+  <a href="#validation-result"><span class="nav-num">6</span> validationResult()</a>
+
+  <div class="nav-group-label">Patterns</div>
+  <a href="#chaining"><span class="nav-num">7</span> Chaining & Custom</a>
+  <a href="#schema"><span class="nav-num">8</span> Schema Validation</a>
+  <a href="#routes"><span class="nav-num">9</span> Route Integration</a>
+
+  <div class="nav-group-label">Advanced</div>
+  <a href="#conditional"><span class="nav-num">10</span> Conditional Validation</a>
+  <a href="#custom-validator"><span class="nav-num">11</span> Custom Validators</a>
+  <a href="#error-handling"><span class="nav-num">12</span> Error Handling</a>
+</nav>
+
+<!-- ───────────────────── MAIN ───────────────────── -->
+<main>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-eyebrow">Sheryians Coding School · Backend Series</div>
+    <h1>express-<em>validator</em></h1>
+    <p class="hero-desc">
+      A battle-tested middleware library for validating and sanitizing user input in Express.js applications — built on top of the powerful <strong>validator.js</strong> library.
+    </p>
+    <div class="hero-tags">
+      <span class="hero-tag">v7.x</span>
+      <span class="hero-tag">express.js</span>
+      <span class="hero-tag">validator.js</span>
+      <span class="hero-tag">middleware</span>
+      <span class="hero-tag">REST APIs</span>
+    </div>
+  </div>
+
+  <!-- ── SECTION 1 — INTRO ── -->
+  <section class="section" id="intro">
+    <div class="section-header">
+      <div class="section-num-big">01</div>
+      <div class="section-title-block">
+        <div class="section-title">Introduction</div>
+        <div class="section-subtitle">Why we validate, and what express-validator gives us</div>
+      </div>
+    </div>
+
+    <div class="concept">
+      <div class="concept-label">Key Concept</div>
+      <p><strong>Validation</strong> checks that data is correct in type and format (e.g. is this a valid email?). <strong>Sanitization</strong> cleans and transforms data (e.g. trim whitespace, escape HTML). Both are essential before touching a database.</p>
+    </div>
+
+    <p>When users submit a form or call your API, you <em>never</em> trust the incoming data. A missing field, an invalid email, or a malformed ID can crash your server, corrupt your database, or open security holes. <code>express-validator</code> solves all of this elegantly by turning validation logic into reusable Express middleware.</p>
+
+    <h3>Why not just write if-checks manually?</h3>
+
+    <table class="compare">
+      <thead>
+        <tr><th>Aspect</th><th>Manual if-checks</th><th>express-validator</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="row-label">Readability</td>
+          <td class="local-val">Nested conditionals, hard to scan</td>
+          <td class="eks-val">Declarative chain reads like English ✓</td>
+        </tr>
+        <tr>
+          <td class="row-label">Reusability</td>
+          <td class="local-val">Copy-paste across routes</td>
+          <td class="eks-val">Extract into a shared array of middleware ✓</td>
+        </tr>
+        <tr>
+          <td class="row-label">Error collection</td>
+          <td class="local-val">You build it yourself</td>
+          <td class="eks-val">Built-in validationResult() ✓</td>
+        </tr>
+        <tr>
+          <td class="row-label">Sanitization</td>
+          <td class="local-val">Additional utility functions needed</td>
+          <td class="eks-val">Built right in — trim, escape, normalise ✓</td>
+        </tr>
+        <tr>
+          <td class="row-label">Async checks</td>
+          <td class="local-val">Messy promise handling</td>
+          <td class="eks-val">Native async custom validators ✓</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <div class="note-icon">💡</div>
+      <p><strong>express-validator wraps validator.js</strong> — so every string validation method you know from <code>validator.js</code> (isEmail, isURL, isUUID, etc.) is available directly on the chain.</p>
+    </div>
+
+  </section>
+
+  <!-- ── SECTION 2 — SETUP ── -->
+  <section class="section" id="setup">
+    <div class="section-header">
+      <div class="section-num-big">02</div>
+      <div class="section-title-block">
+        <div class="section-title">Installation & Setup</div>
+        <div class="section-subtitle">Getting the package into your project</div>
+      </div>
+    </div>
+
+    <div class="step-label">Step 1 — Install</div>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-label">Terminal</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre><span class="c-cmd">npm</span> <span class="c-val">install</span> <span class="c-str">express-validator</span></pre>
+    </div>
+
+    <div class="step-label">Step 2 — Import what you need</div>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-label">app.js / routes/auth.js</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre><span class="c-kw">const</span> { <span class="c-fn">body</span>, <span class="c-fn">param</span>, <span class="c-fn">query</span>, <span class="c-fn">check</span>, <span class="c-fn">validationResult</span> } = <span class="c-cmd">require</span>(<span class="c-str">'express-validator'</span>);
+
+<span class="c-comment">// ES Module (if using "type": "module" in package.json)</span>
+<span class="c-kw">import</span> { body, param, query, check, validationResult } <span class="c-kw">from</span> <span class="c-str">'express-validator'</span>;</pre>
+    </div>
+
+    <div class="concept">
+      <div class="concept-label">Named Exports — What each one targets</div>
+      <p>
+        <strong><code>body('field')</code></strong> — targets <code>req.body.field</code> &nbsp;|&nbsp;
+        <strong><code>param('id')</code></strong> — targets <code>req.params.id</code> &nbsp;|&nbsp;
+        <strong><code>query('page')</code></strong> — targets <code>req.query.page</code> &nbsp;|&nbsp;
+        <strong><code>check('field')</code></strong> — searches body, params, query, cookies, and headers all at once.
+      </p>
+    </div>
+
+    <div class="step-label green">Verify — Minimal working setup</div>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-label">server.js — minimal example</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre><span class="c-kw">const</span> express = <span class="c-cmd">require</span>(<span class="c-str">'express'</span>);
+<span class="c-kw">const</span> { body, validationResult } = <span class="c-cmd">require</span>(<span class="c-str">'express-validator'</span>);
+
+<span class="c-kw">const</span> app = <span class="c-fn">express</span>();
+app.<span class="c-fn">use</span>(express.<span class="c-fn">json</span>());     <span class="c-comment">// ← must come BEFORE routes, parses req.body</span>
+
+app.<span class="c-fn">post</span>(<span class="c-str">'/register'</span>,
+  <span class="c-fn">body</span>(<span class="c-str">'email'</span>).<span class="c-fn">isEmail</span>(),        <span class="c-comment">// validation middleware</span>
+  (req, res) => {
+    <span class="c-kw">const</span> errors = <span class="c-fn">validationResult</span>(req);
+    <span class="c-kw">if</span> (!errors.<span class="c-fn">isEmpty</span>()) {
+      <span class="c-kw">return</span> res.<span class="c-fn">status</span>(<span class="c-num">422</span>).<span class="c-fn">json</span>({ errors: errors.<span class="c-fn">array</span>() });
+    }
+    res.<span class="c-fn">send</span>(<span class="c-str">'Registered!'</span>);
+  }
+);
+
+app.<span class="c-fn">listen</span>(<span class="c-num">3000</span>);</pre>
+    </div>
+
+    <div class="warn">
+      <div class="note-icon">⚠️</div>
+      <p><strong>Always add <code>express.json()</code> before your routes.</strong> Without it, <code>req.body</code> is <code>undefined</code> and every <code>body()</code> validator will silently fail or treat the field as missing.</p>
+    </div>
+
+  </section>
+
+  <!-- ── SECTION 3 — check() & body() ── -->
+  <section class="section" id="check">
+    <div class="section-header">
+      <div class="section-num-big">03</div>
+      <div class="section-title-block">
+        <div class="section-title">check() and body()</div>
+        <div class="section-subtitle">The two most common ways to start a validation chain</div>
+      </div>
+    </div>
+
+    <p>Both <code>check()</code> and <code>body()</code> return a <strong>Validation Chain</strong> — an Express middleware that, when called, runs all attached validators and stores any errors on the request object. You chain methods onto it fluently.</p>
+
+    <h3>Anatomy of a Validation Chain</h3>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-label">Example</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre><span class="c-fn">body</span>(<span class="c-str">'username'</span>)          <span class="c-comment">// 1. which field?</span>
+  .<span class="c-fn">trim</span>()               <span class="c-comment">// 2. sanitize first</span>
+  .<span class="c-fn">notEmpty</span>()           <span class="c-comment">// 3. must not be blank</span>
+  .<span class="c-fn">isLength</span>({ <span class="c-flag">min</span>: <span class="c-num">3</span>, <span class="c-flag">max</span>: <span class="c-num">20</span> })  <span class="c-comment">// 4. length check</span>
+  .<span class="c-fn">withMessage</span>(<span class="c-str">'Username must be 3–20 chars'</span>)  <span class="c-comment">// 5. custom error message</span></pre>
+    </div>
+
+    <h3>Flow of a request</h3>
+
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-line"><div class="flow-dot"></div><div class="flow-connector"></div></div>
+        <div class="flow-content">
+          <div class="flow-title">Request hits route</div>
+          <div class="flow-detail">POST /register with JSON body arrives at Express</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-line"><div class="flow-dot"></div><div class="flow-connector"></div></div>
+        <div class="flow-content">
+          <div class="flow-title">Validation middleware runs</div>
+          <div class="flow-detail">Each <code>body()</code> / <code>check()</code> call is middleware — they run in order, collect errors on <code>req</code></div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-line"><div class="flow-dot"></div><div class="flow-connector"></div></div>
+        <div class="flow-content">
+          <div class="flow-title">Route handler calls validationResult(req)</div>
+          <div class="flow-detail">Extracts all collected errors from the request object</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-line"><div class="flow-dot" style="background:var(--accent2)"></div></div>
+        <div class="flow-content">
+          <div class="flow-title">Respond based on result</div>
+          <div class="flow-detail">If errors → 422 with error list. If clean → process the data.</div>
+        </div>
+      </div>
+    </div>
+
+    <h3>check() vs body() — when to use which</h3>
+
+    <table class="compare">
+      <thead>
+        <tr><th>Function</th><th>Searches in</th><th>Best for</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="row-label"><code>body('field')</code></td>
+          <td class="eks-val">req.body only ✓</td>
+          <td class="eks-val">Form/JSON payloads — most common ✓</td>
+        </tr>
+        <tr>
+          <td class="row-label"><code>param('id')</code></td>
+          <td class="eks-val">req.params only ✓</td>
+          <td class="eks-val">URL segments like /users/:id ✓</td>
+        </tr>
+        <tr>
+          <td class="row-label"><code>query('page')</code></td>
+          <td class="eks-val">req.query only ✓</td>
+          <td class="eks-val">?page=2&sort=asc style params ✓</td>
+        </tr>
+        <tr>
+          <td class="row-label"><code>check('field')</code></td>
+          <td class="local-val">body, params, query, cookies, headers</td>
+          <td class="local-val">Broad check — less explicit, avoid in large codebases</td>
+        </tr>
+      </tbody>
+    </table>
+
+  </section>
+
+  <!-- ── SECTION 4 — VALIDATORS ── -->
+  <section class="section" id="validators">
+    <div class="section-header">
+      <div class="section-num-big">04</div>
+      <div class="section-title-block">
+        <div class="section-title">Built-in Validators</div>
+        <div class="section-subtitle">The full set of checking methods available on the chain</div>
+      </div>
+    </div>
+
+    <p>Every method below is chained onto <code>body()</code>, <code>param()</code>, or <code>query()</code>. They return the same chain, so you can keep adding checks.</p>
+
+    <h3>Existence &amp; Emptiness</h3>
+    <div class="method-grid">
+      <div class="method-card">
+        <div class="method-name">.exists()</div>
+        <div class="method-desc">Field must exist on the request (even if empty string). Fails only if undefined.</div>
+      </div>
+      <div class="method-card">
+        <div class="method-name">.notEmpty()</div>
+        <div class="method-desc">Field must not be an empty string after trimming. Recommended over <code>not().isEmpty()</code>.</div>
+      </div>
+      <div class="method-card">
+        <div class="method-name">.optional()</div>
+        <div class="method-desc">Skips all validators if the field is absent or undefined. Use to make a field truly optional.</div>
+      </div>
+      <div class="method-card">
+        <div class="method-name">.optional({ nullable: true })</div>
+        <div class="method-desc">Skips validation if field is absent <em>or null</em>. Useful when frontend can send null explicitly.</div>
+      </div>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-label">Existence examples</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre><span class="c-fn">body</span>(<span class="c-str">'name'</span>).<span class="c-fn">notEmpty</span>().<span class="c-fn">withMessage</span>(<span class="c-str">'Name is required'</span>)
+
+<span class="c-fn">body</span>(<span class="c-str">'bio'</span>).<span class="c-fn">optional</span>().<span class="c-fn">isLength</span>({ <span class="c-flag">max</span>: <span class="c-num">200</span> })  <span class="c-comment">// only checks length if bio is present</span>
+
+<span class="c-fn">body</span>(<span class="c-str">'avatar'</span>).<span class="c-fn">optional</span>({ <span class="c-flag">nullable</span>: <span class="c-kw">true</span> }).<span class="c-fn">isURL</span>()  <span class="c-comment">// allows null or missing</span></pre>
+    </div>
+
+    <h3>String Validators</h3>
+    <table class="flag-table">
+      <thead>
+        <tr><th>Method</th><th>Options</th><th>What it validates</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="f-name">.isEmail()</span></td>
+          <td><span class="f-val">—</span></td>
+          <td class="f-desc">Valid email address format (uses validator.js isEmail)</td>
+        </tr>
+        <tr>
+          <td><span class="f-name">.isURL()</span></td>
+          <td><span class="f-val">{ protocols, require_tld }</span></td>
+          <td class="f-desc">Valid URL. Accepts options to restrict protocols (http, https)</td>
+        </tr>
+        <tr>
+          <td><span class="f-name">.isLength()</span></td>
+          <td><span class="f-val">{ min, max }</span></td>
+          <td class="f-desc">String length between min and max (inclusive)</td>
+        </tr>
+        <tr>
+          <td><span class="f-name">.isAlpha()</span></td>
+          <td><span class="f-val">locale</span></td>
+          <td class="f-desc">Contains only letters A-Z. Optional locale for unicode.</td>
+        </tr>
+        <tr>
+          <td><span class="f-name">.isAlphanumeric()</span></td>
+          <td><span class="f-val">locale</span></td>
+          <td class="f-desc">Contains only letters and numbers</td>
+        </tr>
+        <tr>
+          <td><span class="f-name">.isStrongPassword()</span></td>
+          <td><span class="f-val">{ minLength, minNumbers, minSymbols }</span></td>
+          <td class="f-desc">Password strength: uppercase, lowercase, numbers, symbols</td>
+        </tr>
+        <tr>
+          <td><span class="f-name">.matches()</span></td>
+          <td><span class="f-val">/regex/</span></td>
+          <td class="f-desc">Must match the provided regular expression</td>
+        </tr>
+        <tr>
+          <td><span class="f-name">.isIn()</span></td>
+          <td><span class="f-val">['a','b','c']</span></td>
+          <td class="f-desc">Value must be one of the allowed values</td>
+        </tr>
+        <tr>
+          <td><span class="f-name">.contains()</span></td>
+          <td><span class="f-val">'seed'</span></td>
+          <td class="f-desc">String must contain the given seed string</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Number Validators</h3>
+    <table class="flag-table">
+      <thead>
+        <tr><th>Method</th><th>Options</th><th>What it validates</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="f-name">.isInt()</span></td>
+          <td><span class="f-val">{ min, max }</span></td>
+          <td class="f-desc">Is an integer. Optional min/max range constraints.</td>
+        </tr>
+        <tr>
+          <td><span class="f-name">.isFloat()</span></td>
+          <td><span class="f-val">{ min, max }</span></td>
+          <td class="f-desc">Is a floating point number, with optional range</td>
+        </tr>
+        <tr>
+          <td><span class="f-name">.isNumeric()</span></td>
+          <td><span class="f-val">—</span></td>
+          <td class="f-desc">Contains only numeric characters (allows sign and decimal)</td>
+        </tr>
+        <tr>
+          <td><span class="f-name">.isDecimal()</span></td>
+          <td><span class="f-val">{ decimal_digits }</span></td>
+          <td class="f-desc">Is a decimal number with optional precision settings</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Format / Special Validators</h3>
+    <table class="flag-table">
+      <thead>
+        <tr><th>Method</th><th>What it validates</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="f-name">.isMongoId()</span></td>
+          <td class="f-desc">Valid MongoDB ObjectID (24-char hex string)</td>
+        </tr>
+        <tr>
+          <td><span class="f-name">.isUUID()</span></td>
+          <td class="f-desc">Valid UUID (v1, v2, v3, v4, v5, or "all")</td>
+        </tr>
+        <tr>
+          <td><span class="f-name">.isDate()</span></td>
+          <td class="f-desc">Parseable date string (e.g. 2024-01-15)</td>
+        </tr>
+        <tr>
+          <td><span class="f-name">.isISO8601()</span></td>
+          <td class="f-desc">ISO 8601 datetime format (e.g. 2024-01-15T10:30:00Z)</td>
+        </tr>
+        <tr>
+          <td><span class="f-name">.isBoolean()</span></td>
+          <td class="f-desc">Value is "true", "false", "1", or "0"</td>
+        </tr>
+        <tr>
+          <td><span class="f-name">.isIP()</span></td>
+          <td class="f-desc">Valid IPv4 or IPv6 address</td>
+        </tr>
+        <tr>
+          <td><span class="f-name">.isJWT()</span></td>
+          <td class="f-desc">Valid JWT format (three dot-separated base64 segments)</td>
+        </tr>
+        <tr>
+          <td><span class="f-name">.isJSON()</span></td>
+          <td class="f-desc">Valid JSON string (parseable)</td>
+        </tr>
+        <tr>
+          <td><span class="f-name">.isMobilePhone()</span></td>
+          <td class="f-desc">Valid phone number, supports locale ('en-IN', 'any', etc.)</td>
+        </tr>
+        <tr>
+          <td><span class="f-name">.isPostalCode()</span></td>
+          <td class="f-desc">Valid postal/zip code for a given locale</td>
+        </tr>
+        <tr>
+          <td><span class="f-name">.isCreditCard()</span></td>
+          <td class="f-desc">Valid credit card number (Luhn algorithm check)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Practical Example — User Registration</h3>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-label">routes/auth.js</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre><span class="c-kw">const</span> registerValidators = [
+  <span class="c-fn">body</span>(<span class="c-str">'name'</span>)
+    .<span class="c-fn">trim</span>()
+    .<span class="c-fn">notEmpty</span>().<span class="c-fn">withMessage</span>(<span class="c-str">'Name is required'</span>)
+    .<span class="c-fn">isLength</span>({ <span class="c-flag">min</span>: <span class="c-num">2</span>, <span class="c-flag">max</span>: <span class="c-num">50</span> }).<span class="c-fn">withMessage</span>(<span class="c-str">'Name must be 2–50 characters'</span>),
+
+  <span class="c-fn">body</span>(<span class="c-str">'email'</span>)
+    .<span class="c-fn">normalizeEmail</span>()       <span class="c-comment">// sanitize: lowercase, remove dots in Gmail</span>
+    .<span class="c-fn">isEmail</span>().<span class="c-fn">withMessage</span>(<span class="c-str">'Enter a valid email'</span>),
+
+  <span class="c-fn">body</span>(<span class="c-str">'password'</span>)
+    .<span class="c-fn">isStrongPassword</span>({
+      <span class="c-flag">minLength</span>: <span class="c-num">8</span>,
+      <span class="c-flag">minNumbers</span>: <span class="c-num">1</span>,
+      <span class="c-flag">minSymbols</span>: <span class="c-num">1</span>,
+    })
+    .<span class="c-fn">withMessage</span>(<span class="c-str">'Password needs 8+ chars, 1 number, 1 symbol'</span>),
+
+  <span class="c-fn">body</span>(<span class="c-str">'age'</span>)
+    .<span class="c-fn">optional</span>()
+    .<span class="c-fn">isInt</span>({ <span class="c-flag">min</span>: <span class="c-num">13</span>, <span class="c-flag">max</span>: <span class="c-num">120</span> }).<span class="c-fn">withMessage</span>(<span class="c-str">'Age must be between 13 and 120'</span>),
+];
+
+router.<span class="c-fn">post</span>(<span class="c-str">'/register'</span>, registerValidators, registerController);</pre>
+    </div>
+
+  </section>
+
+  <!-- ── SECTION 5 — SANITIZERS ── -->
+  <section class="section" id="sanitizers">
+    <div class="section-header">
+      <div class="section-num-big">05</div>
+      <div class="section-title-block">
+        <div class="section-title">Sanitizers</div>
+        <div class="section-subtitle">Clean and transform data before it reaches your database</div>
+      </div>
+    </div>
+
+    <div class="concept">
+      <div class="concept-label">Key Concept</div>
+      <p><strong>Sanitizers modify <code>req.body</code></strong> in place. After sanitizer middleware runs, the field value on <code>req.body.field</code> is the cleaned version — not the original. Always sanitize before validation for most accurate results.</p>
+    </div>
+
+    <h3>Common Sanitizers</h3>
+
+    <table class="flag-table">
+      <thead>
+        <tr><th>Method</th><th>What it does</th><th>Example</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="f-name">.trim()</span></td>
+          <td class="f-desc">Remove leading/trailing whitespace</td>
+          <td><span class="f-val">"  hello  " → "hello"</span></td>
+        </tr>
+        <tr>
+          <td><span class="f-name">.escape()</span></td>
+          <td class="f-desc">Convert HTML special chars to entities — prevents XSS</td>
+          <td><span class="f-val">"&lt;b&gt;" → "&amp;lt;b&amp;gt;"</span></td>
+        </tr>
+        <tr>
+          <td><span class="f-name">.toLowerCase()</span></td>
+          <td class="f-desc">Convert string to lowercase</td>
+          <td><span class="f-val">"HELLO" → "hello"</span></td>
+        </tr>
+        <tr>
+          <td><span class="f-name">.toUpperCase()</span></td>
+          <td class="f-desc">Convert string to uppercase</td>
+          <td><span class="f-val">"hello" → "HELLO"</span></td>
+        </tr>
+        <tr>
+          <td><span class="f-name">.normalizeEmail()</span></td>
+          <td class="f-desc">Lowercase + remove Gmail dots + handle aliases</td>
+          <td><span class="f-val">"Foo.Bar@Gmail.com" → "foobar@gmail.com"</span></td>
+        </tr>
+        <tr>
+          <td><span class="f-name">.toInt()</span></td>
+          <td class="f-desc">Convert string to integer</td>
+          <td><span class="f-val">"42" → 42 (number)</span></td>
+        </tr>
+        <tr>
+          <td><span class="f-name">.toFloat()</span></td>
+          <td class="f-desc">Convert string to float</td>
+          <td><span class="f-val">"3.14" → 3.14 (number)</span></td>
+        </tr>
+        <tr>
+          <td><span class="f-name">.toBoolean()</span></td>
+          <td class="f-desc">Convert "true"/"1" to true, "false"/"0" to false</td>
+          <td><span class="f-val">"true" → true</span></td>
+        </tr>
+        <tr>
+          <td><span class="f-name">.stripLow()</span></td>
+          <td class="f-desc">Remove low ASCII control characters</td>
+          <td><span class="f-val">Removes \x00–\x1F chars</span></td>
+        </tr>
+        <tr>
+          <td><span class="f-name">.blacklist(chars)</span></td>
+          <td class="f-desc">Remove specified characters from the string</td>
+          <td><span class="f-val">blacklist('0-9') removes all digits</span></td>
+        </tr>
+        <tr>
+          <td><span class="f-name">.whitelist(chars)</span></td>
+          <td class="f-desc">Keep only the specified characters</td>
+          <td><span class="f-val">whitelist('a-z') keeps only lowercase</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="step-label blue">Best Practice — Sanitize order</div>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-label">Sanitize THEN validate</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre><span class="c-comment">// ✅ Correct order: sanitize first, then validate</span>
+<span class="c-fn">body</span>(<span class="c-str">'username'</span>)
+  .<span class="c-fn">trim</span>()                    <span class="c-comment">// 1. remove whitespace</span>
+  .<span class="c-fn">toLowerCase</span>()             <span class="c-comment">// 2. normalize case</span>
+  .<span class="c-fn">notEmpty</span>()                <span class="c-comment">// 3. now check it's not empty</span>
+  .<span class="c-fn">isAlphanumeric</span>()          <span class="c-comment">// 4. check format on clean value</span>
+  .<span class="c-fn">isLength</span>({ <span class="c-flag">min</span>: <span class="c-num">3</span>, <span class="c-flag">max</span>: <span class="c-num">20</span> })
+
+<span class="c-comment">// ❌ If you validate before trim, " " passes notEmpty() but is invalid</span></pre>
+    </div>
+
+    <div class="note">
+      <div class="note-icon">💡</div>
+      <p>After sanitizers run, <strong><code>req.body.username</code> is already the cleaned value</strong> in your controller. You don't need to trim/lowercase again — it's done. This is one of the big wins over manual validation.</p>
+    </div>
+
+  </section>
+
+  <!-- ── SECTION 6 — validationResult ── -->
+  <section class="section" id="validation-result">
+    <div class="section-header">
+      <div class="section-num-big">06</div>
+      <div class="section-title-block">
+        <div class="section-title">validationResult()</div>
+        <div class="section-subtitle">Collecting and responding to errors from the request</div>
+      </div>
+    </div>
+
+    <p><code>validationResult(req)</code> collects all errors that were attached to <code>req</code> by the validation middleware. It returns a <strong>Result object</strong> — not an array directly.</p>
+
+    <h3>The Result Object</h3>
+
+    <table class="flag-table">
+      <thead>
+        <tr><th>Method</th><th>Returns</th><th>Use case</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="f-name">.isEmpty()</span></td>
+          <td><span class="f-val">boolean</span></td>
+          <td class="f-desc">true if there are NO errors. Most common check.</td>
+        </tr>
+        <tr>
+          <td><span class="f-name">.array()</span></td>
+          <td><span class="f-val">Error[]</span></td>
+          <td class="f-desc">All errors as an array. Best for sending in API response.</td>
+        </tr>
+        <tr>
+          <td><span class="f-name">.mapped()</span></td>
+          <td><span class="f-val">{ field: Error }</span></td>
+          <td class="f-desc">Errors as an object keyed by field name. Only the first error per field.</td>
+        </tr>
+        <tr>
+          <td><span class="f-name">.throw()</span></td>
+          <td><span class="f-val">throws</span></td>
+          <td class="f-desc">Throws an error if any validation failed. Use in try/catch flows.</td>
+        </tr>
+        <tr>
+          <td><span class="f-name">.formatWith(fn)</span></td>
+          <td><span class="f-val">Result</span></td>
+          <td class="f-desc">Custom error formatter before calling .array()</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Shape of each error object</h3>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-label">Error object shape (from .array())</span>
+      </div>
+      <pre>{
+  <span class="c-key">type</span>:     <span class="c-str">"field"</span>,           <span class="c-comment">// error type</span>
+  <span class="c-key">value</span>:    <span class="c-str">""</span>,               <span class="c-comment">// the invalid value that was submitted</span>
+  <span class="c-key">msg</span>:      <span class="c-str">"Invalid email"</span>,  <span class="c-comment">// your withMessage() string</span>
+  <span class="c-key">path</span>:     <span class="c-str">"email"</span>,          <span class="c-comment">// the field name</span>
+  <span class="c-key">location</span>: <span class="c-str">"body"</span>            <span class="c-comment">// "body", "params", "query", etc.</span>
+}</pre>
+    </div>
+
+    <h3>Three patterns for handling errors</h3>
+
+    <div class="step-label">Pattern 1 — Return errors inline (most common)</div>
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-label">controller.js</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre><span class="c-kw">const</span> registerUser = <span class="c-kw">async</span> (req, res) => {
+  <span class="c-kw">const</span> errors = <span class="c-fn">validationResult</span>(req);
+  <span class="c-kw">if</span> (!errors.<span class="c-fn">isEmpty</span>()) {
+    <span class="c-kw">return</span> res.<span class="c-fn">status</span>(<span class="c-num">422</span>).<span class="c-fn">json</span>({
+      <span class="c-key">success</span>: <span class="c-kw">false</span>,
+      <span class="c-key">errors</span>: errors.<span class="c-fn">array</span>(),
+    });
+  }
+  <span class="c-comment">// safe to use req.body here</span>
+};</pre>
+    </div>
+
+    <div class="step-label blue">Pattern 2 — mapped() for field-level errors (great for forms)</div>
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-label">controller.js — field map</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre><span class="c-kw">const</span> errors = <span class="c-fn">validationResult</span>(req).<span class="c-fn">mapped</span>();
+<span class="c-comment">// { email: { msg: 'Invalid email', ... }, name: { msg: '...' } }</span>
+
+<span class="c-kw">if</span> (Object.<span class="c-fn">keys</span>(errors).<span class="c-fn">length</span> > <span class="c-num">0</span>) {
+  <span class="c-kw">return</span> res.<span class="c-fn">status</span>(<span class="c-num">422</span>).<span class="c-fn">json</span>({ errors });
+}</pre>
+    </div>
+
+    <div class="step-label gold">Pattern 3 — Extracting a reusable middleware</div>
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-label">middleware/validate.js — shared error handler</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre><span class="c-comment">// Define once, use everywhere</span>
+<span class="c-kw">const</span> validate = (req, res, next) => {
+  <span class="c-kw">const</span> errors = <span class="c-fn">validationResult</span>(req);
+  <span class="c-kw">if</span> (!errors.<span class="c-fn">isEmpty</span>()) {
+    <span class="c-kw">return</span> res.<span class="c-fn">status</span>(<span class="c-num">422</span>).<span class="c-fn">json</span>({ <span class="c-key">errors</span>: errors.<span class="c-fn">array</span>() });
+  }
+  <span class="c-fn">next</span>();
+};
+
+<span class="c-comment">// In your route:</span>
+router.<span class="c-fn">post</span>(<span class="c-str">'/register'</span>,
+  [...registerValidators],   <span class="c-comment">// validation chains</span>
+  validate,                  <span class="c-comment">// shared error checker ← clean!</span>
+  registerController         <span class="c-comment">// only runs if validation passed</span>
+);</pre>
+    </div>
+
+    <div class="note">
+      <div class="note-icon">💡</div>
+      <p><strong>Pattern 3 is strongly recommended</strong> for production code. It keeps controllers clean and DRY — no copy-pasting the error check into every handler.</p>
+    </div>
+
+  </section>
+
+  <!-- ── SECTION 7 — CHAINING & CUSTOM ── -->
+  <section class="section" id="chaining">
+    <div class="section-header">
+      <div class="section-num-big">07</div>
+      <div class="section-title-block">
+        <div class="section-title">Chaining & withMessage()</div>
+        <div class="section-subtitle">Multiple validators, per-check messages, and negation</div>
+      </div>
+    </div>
+
+    <h3>withMessage() — per validator messages</h3>
+    <p>By default, failed validators use a generic error message from validator.js. You almost always want to override this.</p>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-label">Multiple validators, individual messages</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre><span class="c-fn">body</span>(<span class="c-str">'password'</span>)
+  .<span class="c-fn">notEmpty</span>().<span class="c-fn">withMessage</span>(<span class="c-str">'Password is required'</span>)
+  .<span class="c-fn">isLength</span>({ <span class="c-flag">min</span>: <span class="c-num">8</span> }).<span class="c-fn">withMessage</span>(<span class="c-str">'Minimum 8 characters'</span>)
+  .<span class="c-fn">matches</span>(<span class="c-str">/\d/</span>).<span class="c-fn">withMessage</span>(<span class="c-str">'Must contain at least one digit'</span>)
+  .<span class="c-fn">matches</span>(<span class="c-str">/[!@#$%]/</span>).<span class="c-fn">withMessage</span>(<span class="c-str">'Must contain a special character'</span>)</pre>
+    </div>
+
+    <div class="note">
+      <div class="note-icon">💡</div>
+      <p><strong>Each <code>.withMessage()</code> applies to the validator immediately before it</strong>, not the whole chain. If you put <code>.withMessage()</code> at the end, it only covers the last check.</p>
+    </div>
+
+    <h3>Negation with .not()</h3>
+    <p>Prefix any validator with <code>.not()</code> to invert it.</p>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-label">Negation examples</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre><span class="c-fn">body</span>(<span class="c-str">'username'</span>)
+  .<span class="c-fn">not</span>().<span class="c-fn">isIn</span>([<span class="c-str">'admin'</span>, <span class="c-str">'root'</span>, <span class="c-str">'superuser'</span>])
+  .<span class="c-fn">withMessage</span>(<span class="c-str">'This username is reserved'</span>)
+
+<span class="c-fn">body</span>(<span class="c-str">'email'</span>)
+  .<span class="c-fn">not</span>().<span class="c-fn">contains</span>(<span class="c-str">'+</span>')
+  .<span class="c-fn">withMessage</span>(<span class="c-str">'Email aliases with + are not allowed'</span>)</pre>
+    </div>
+
+    <h3>bail() — stop on first failure</h3>
+    <p>By default all validators in a chain run even if an early one fails. <code>.bail()</code> stops the chain as soon as the previous check fails — saves unnecessary work.</p>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-label">bail() usage</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre><span class="c-fn">body</span>(<span class="c-str">'email'</span>)
+  .<span class="c-fn">notEmpty</span>().<span class="c-fn">bail</span>()       <span class="c-comment">// if empty, stop here — don't run isEmail</span>
+  .<span class="c-fn">isEmail</span>().<span class="c-fn">bail</span>()         <span class="c-comment">// if not email, stop — don't run DB check</span>
+  .<span class="c-fn">custom</span>(<span class="c-kw">async</span> (email) => {
+    <span class="c-kw">const</span> user = <span class="c-kw">await</span> User.<span class="c-fn">findOne</span>({ email });
+    <span class="c-kw">if</span> (user) <span class="c-kw">throw new</span> Error(<span class="c-str">'Email already registered'</span>);
+  });</pre>
+    </div>
+
+  </section>
+
+  <!-- ── SECTION 8 — SCHEMA ── -->
+  <section class="section" id="schema">
+    <div class="section-header">
+      <div class="section-num-big">08</div>
+      <div class="section-title-block">
+        <div class="section-title">Schema Validation</div>
+        <div class="section-subtitle">Define all validators as a plain object — great for complex forms</div>
+      </div>
+    </div>
+
+    <div class="concept">
+      <div class="concept-label">Key Concept</div>
+      <p><strong>checkSchema()</strong> accepts a single object where keys are field names and values describe the full validation config for that field. Avoids long arrays of <code>body()</code> calls — especially clean for API documentation purposes.</p>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-label">checkSchema() example</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre><span class="c-kw">const</span> { checkSchema } = <span class="c-cmd">require</span>(<span class="c-str">'express-validator'</span>);
+
+<span class="c-kw">const</span> createUserSchema = {
+  <span class="c-key">name</span>: {
+    <span class="c-key">trim</span>: <span class="c-kw">true</span>,
+    <span class="c-key">notEmpty</span>: { <span class="c-key">errorMessage</span>: <span class="c-str">'Name is required'</span> },
+    <span class="c-key">isLength</span>: { <span class="c-key">options</span>: { <span class="c-flag">min</span>: <span class="c-num">2</span>, <span class="c-flag">max</span>: <span class="c-num">50</span> }, <span class="c-key">errorMessage</span>: <span class="c-str">'2-50 chars'</span> },
+  },
+  <span class="c-key">email</span>: {
+    <span class="c-key">normalizeEmail</span>: <span class="c-kw">true</span>,
+    <span class="c-key">isEmail</span>: { <span class="c-key">errorMessage</span>: <span class="c-str">'Enter a valid email'</span> },
+  },
+  <span class="c-key">age</span>: {
+    <span class="c-key">optional</span>: <span class="c-kw">true</span>,
+    <span class="c-key">isInt</span>: { <span class="c-key">options</span>: { <span class="c-flag">min</span>: <span class="c-num">13</span> }, <span class="c-key">errorMessage</span>: <span class="c-str">'Must be 13 or older'</span> },
+    <span class="c-key">toInt</span>: <span class="c-kw">true</span>,
+  },
+};
+
+router.<span class="c-fn">post</span>(<span class="c-str">'/user'</span>, <span class="c-fn">checkSchema</span>(createUserSchema), validate, createUser);</pre>
+    </div>
+
+    <div class="note">
+      <div class="note-icon">💡</div>
+      <p>Schema style is preferred in teams because it's <strong>easy to read, self-documenting, and can be stored in a separate file</strong> (e.g. <code>schemas/createUser.js</code>) keeping your routes and controllers clean.</p>
+    </div>
+
+  </section>
+
+  <!-- ── SECTION 9 — ROUTES ── -->
+  <section class="section" id="routes">
+    <div class="section-header">
+      <div class="section-num-big">09</div>
+      <div class="section-title-block">
+        <div class="section-title">Route Integration</div>
+        <div class="section-subtitle">Wiring validators into a real Express router structure</div>
+      </div>
+    </div>
+
+    <p>Here's a complete, production-style example showing how to structure your route files with validators extracted into their own module.</p>
+
+    <div class="step-label">File 1 — validators/userValidator.js</div>
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-label">validators/userValidator.js</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre><span class="c-kw">const</span> { body, param } = <span class="c-cmd">require</span>(<span class="c-str">'express-validator'</span>);
+
+<span class="c-kw">const</span> createUserValidators = [
+  <span class="c-fn">body</span>(<span class="c-str">'name'</span>).<span class="c-fn">trim</span>().<span class="c-fn">notEmpty</span>().<span class="c-fn">isLength</span>({ <span class="c-flag">min</span>: <span class="c-num">2</span> }),
+  <span class="c-fn">body</span>(<span class="c-str">'email'</span>).<span class="c-fn">normalizeEmail</span>().<span class="c-fn">isEmail</span>(),
+  <span class="c-fn">body</span>(<span class="c-str">'password'</span>).<span class="c-fn">isStrongPassword</span>().<span class="c-fn">withMessage</span>(<span class="c-str">'Weak password'</span>),
+];
+
+<span class="c-kw">const</span> updateUserValidators = [
+  <span class="c-fn">param</span>(<span class="c-str">'id'</span>).<span class="c-fn">isMongoId</span>().<span class="c-fn">withMessage</span>(<span class="c-str">'Invalid user ID'</span>),
+  <span class="c-fn">body</span>(<span class="c-str">'name'</span>).<span class="c-fn">optional</span>().<span class="c-fn">trim</span>().<span class="c-fn">isLength</span>({ <span class="c-flag">min</span>: <span class="c-num">2</span> }),
+  <span class="c-fn">body</span>(<span class="c-str">'email'</span>).<span class="c-fn">optional</span>().<span class="c-fn">normalizeEmail</span>().<span class="c-fn">isEmail</span>(),
+];
+
+module.exports = { createUserValidators, updateUserValidators };</pre>
+    </div>
+
+    <div class="step-label">File 2 — middleware/validate.js</div>
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-label">middleware/validate.js</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre><span class="c-kw">const</span> { validationResult } = <span class="c-cmd">require</span>(<span class="c-str">'express-validator'</span>);
+
+<span class="c-kw">const</span> validate = (req, res, next) => {
+  <span class="c-kw">const</span> errors = <span class="c-fn">validationResult</span>(req);
+  <span class="c-kw">if</span> (!errors.<span class="c-fn">isEmpty</span>()) {
+    <span class="c-kw">return</span> res.<span class="c-fn">status</span>(<span class="c-num">422</span>).<span class="c-fn">json</span>({
+      <span class="c-key">success</span>: <span class="c-kw">false</span>,
+      <span class="c-key">message</span>: <span class="c-str">'Validation failed'</span>,
+      <span class="c-key">errors</span>: errors.<span class="c-fn">array</span>().<span class="c-fn">map</span>(e => ({ <span class="c-key">field</span>: e.path, <span class="c-key">msg</span>: e.msg })),
+    });
+  }
+  <span class="c-fn">next</span>();
+};
+
+module.exports = validate;</pre>
+    </div>
+
+    <div class="step-label">File 3 — routes/users.js</div>
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-label">routes/users.js</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre><span class="c-kw">const</span> router = <span class="c-cmd">require</span>(<span class="c-str">'express'</span>).<span class="c-fn">Router</span>();
+<span class="c-kw">const</span> { createUserValidators, updateUserValidators } = <span class="c-cmd">require</span>(<span class="c-str">'../validators/userValidator'</span>);
+<span class="c-kw">const</span> validate = <span class="c-cmd">require</span>(<span class="c-str">'../middleware/validate'</span>);
+<span class="c-kw">const</span> userController = <span class="c-cmd">require</span>(<span class="c-str">'../controllers/userController'</span>);
+
+router.<span class="c-fn">post</span>(<span class="c-str">'/'</span>,       createUserValidators, validate, userController.create);
+router.<span class="c-fn">put</span>(<span class="c-str">'/:id'</span>,    updateUserValidators, validate, userController.update);
+router.<span class="c-fn">delete</span>(<span class="c-str">'/:id'</span>,
+  [<span class="c-fn">param</span>(<span class="c-str">'id'</span>).<span class="c-fn">isMongoId</span>()], validate, userController.remove
+);
+
+module.exports = router;</pre>
+    </div>
+
+    <div class="scale-diagram">
+      <span class="hi">Request arrives</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+      <span class="green">Validation chains run (body, param, query)</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+      <span class="hi">validate middleware checks result</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+      <span class="red">Errors? → 422 with errors array</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+      <span class="green">Clean? → next() → Controller runs ✅</span>
+    </div>
+
+  </section>
+
+  <!-- ── SECTION 10 — CONDITIONAL ── -->
+  <section class="section" id="conditional">
+    <div class="section-header">
+      <div class="section-num-big">10</div>
+      <div class="section-title-block">
+        <div class="section-title">Conditional Validation</div>
+        <div class="section-subtitle">Validate fields only when certain conditions are met</div>
+      </div>
+    </div>
+
+    <h3>if() — run a check only when a condition passes</h3>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-label">Conditional — validate phone only if role is 'driver'</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre><span class="c-fn">body</span>(<span class="c-str">'phone'</span>)
+  .<span class="c-fn">if</span>(<span class="c-fn">body</span>(<span class="c-str">'role'</span>).<span class="c-fn">equals</span>(<span class="c-str">'driver'</span>))
+  .<span class="c-fn">notEmpty</span>().<span class="c-fn">withMessage</span>(<span class="c-str">'Phone is required for drivers'</span>)
+  .<span class="c-fn">isMobilePhone</span>(<span class="c-str">'en-IN'</span>)</pre>
+    </div>
+
+    <h3>unless() — run a check unless a condition passes</h3>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-label">Unless — require address unless user is "guest"</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre><span class="c-fn">body</span>(<span class="c-str">'address'</span>)
+  .<span class="c-fn">unless</span>(<span class="c-fn">body</span>(<span class="c-str">'userType'</span>).<span class="c-fn">equals</span>(<span class="c-str">'guest'</span>))
+  .<span class="c-fn">notEmpty</span>().<span class="c-fn">withMessage</span>(<span class="c-str">'Address required for registered users'</span>)</pre>
+    </div>
+
+    <h3>Validating arrays of fields</h3>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-label">Array validation — each item in req.body.tags</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre><span class="c-comment">// req.body.tags = ['javascript', 'nodejs', ...]</span>
+<span class="c-fn">body</span>(<span class="c-str">'tags'</span>)
+  .<span class="c-fn">isArray</span>({ <span class="c-flag">min</span>: <span class="c-num">1</span>, <span class="c-flag">max</span>: <span class="c-num">5</span> })
+  .<span class="c-fn">withMessage</span>(<span class="c-str">'Provide 1–5 tags'</span>)
+
+<span class="c-fn">body</span>(<span class="c-str">'tags.*'</span>)             <span class="c-comment">// wildcard — validates EACH item in the array</span>
+  .<span class="c-fn">trim</span>()
+  .<span class="c-fn">isString</span>()
+  .<span class="c-fn">isLength</span>({ <span class="c-flag">min</span>: <span class="c-num">2</span>, <span class="c-flag">max</span>: <span class="c-num">20</span> })
+  .<span class="c-fn">withMessage</span>(<span class="c-str">'Each tag must be 2–20 characters'</span>)</pre>
+    </div>
+
+    <h3>Nested objects</h3>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-label">Nested — req.body.address.city</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre><span class="c-comment">// req.body = { address: { city: 'Mumbai', pincode: '400001' } }</span>
+<span class="c-fn">body</span>(<span class="c-str">'address.city'</span>).<span class="c-fn">notEmpty</span>().<span class="c-fn">isAlpha</span>()
+<span class="c-fn">body</span>(<span class="c-str">'address.pincode'</span>).<span class="c-fn">isPostalCode</span>(<span class="c-str">'IN'</span>)</pre>
+    </div>
+
+  </section>
+
+  <!-- ── SECTION 11 — CUSTOM VALIDATORS ── -->
+  <section class="section" id="custom-validator">
+    <div class="section-header">
+      <div class="section-num-big">11</div>
+      <div class="section-title-block">
+        <div class="section-title">Custom Validators</div>
+        <div class="section-subtitle">Write your own logic — including async database checks</div>
+      </div>
+    </div>
+
+    <div class="concept">
+      <div class="concept-label">Key Concept</div>
+      <p><strong>.custom(fn)</strong> accepts a function that receives the field value and a meta object <code>{ req, path, location }</code>. To fail validation, <strong>throw an Error</strong> or return a rejected Promise. To pass, return nothing or a resolved Promise.</p>
+    </div>
+
+    <h3>Synchronous custom validator</h3>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-label">custom() — sync</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre><span class="c-fn">body</span>(<span class="c-str">'username'</span>)
+  .<span class="c-fn">custom</span>((value) => {
+    <span class="c-kw">if</span> (value.includes(<span class="c-str">' '</span>)) {
+      <span class="c-kw">throw new</span> Error(<span class="c-str">'Username cannot contain spaces'</span>);
+    }
+    <span class="c-kw">return true</span>;  <span class="c-comment">// explicitly return true to pass</span>
+  })</pre>
+    </div>
+
+    <h3>Async custom validator — check database uniqueness</h3>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-label">custom() — async DB check</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre><span class="c-fn">body</span>(<span class="c-str">'email'</span>)
+  .<span class="c-fn">isEmail</span>().<span class="c-fn">bail</span>()           <span class="c-comment">// bail so DB isn't hit with invalid email</span>
+  .<span class="c-fn">custom</span>(<span class="c-kw">async</span> (email) => {
+    <span class="c-kw">const</span> existingUser = <span class="c-kw">await</span> User.<span class="c-fn">findOne</span>({ email });
+    <span class="c-kw">if</span> (existingUser) {
+      <span class="c-kw">throw new</span> Error(<span class="c-str">'Email is already registered'</span>);
+    }
+  })</pre>
+    </div>
+
+    <h3>Cross-field validation — password confirm</h3>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-label">Access other fields via meta.req</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre><span class="c-fn">body</span>(<span class="c-str">'confirmPassword'</span>)
+  .<span class="c-fn">custom</span>((value, { req }) => {
+    <span class="c-kw">if</span> (value !== req.body.password) {
+      <span class="c-kw">throw new</span> Error(<span class="c-str">'Passwords do not match'</span>);
+    }
+    <span class="c-kw">return true</span>;
+  })</pre>
+    </div>
+
+    <div class="warn">
+      <div class="note-icon">⚠️</div>
+      <p><strong>Always use <code>.bail()</code> before async custom validators.</strong> If <code>isEmail()</code> fails, you don't want to fire a DB query with a garbage email — that wastes resources and can cause Mongoose errors.</p>
+    </div>
+
+  </section>
+
+  <!-- ── SECTION 12 — ERROR HANDLING ── -->
+  <section class="section" id="error-handling">
+    <div class="section-header">
+      <div class="section-num-big">12</div>
+      <div class="section-title-block">
+        <div class="section-title">Error Handling Patterns</div>
+        <div class="section-subtitle">Clean, consistent API error responses</div>
+      </div>
+    </div>
+
+    <h3>Standard API error response shape</h3>
+    <p>Keep a consistent JSON shape across all your endpoints so frontend can handle errors uniformly.</p>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-label">Response shape</span>
+      </div>
+      <pre>{
+  <span class="c-key">"success"</span>: <span class="c-kw">false</span>,
+  <span class="c-key">"message"</span>: <span class="c-str">"Validation failed"</span>,
+  <span class="c-key">"errors"</span>: [
+    { <span class="c-key">"field"</span>: <span class="c-str">"email"</span>,    <span class="c-key">"msg"</span>: <span class="c-str">"Enter a valid email"</span> },
+    { <span class="c-key">"field"</span>: <span class="c-str">"password"</span>, <span class="c-key">"msg"</span>: <span class="c-str">"Minimum 8 characters"</span> }
+  ]
+}</pre>
+    </div>
+
+    <h3>Production-grade validate middleware</h3>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-label">middleware/validate.js — full version</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre><span class="c-kw">const</span> { validationResult } = <span class="c-cmd">require</span>(<span class="c-str">'express-validator'</span>);
+
+<span class="c-kw">const</span> validate = (req, res, next) => {
+  <span class="c-kw">const</span> result = <span class="c-fn">validationResult</span>(req);
+
+  <span class="c-kw">if</span> (result.<span class="c-fn">isEmpty</span>()) <span class="c-kw">return</span> <span class="c-fn">next</span>();
+
+  <span class="c-kw">const</span> errors = result.<span class="c-fn">array</span>().<span class="c-fn">map</span>(({ path, msg }) => ({ <span class="c-key">field</span>: path, <span class="c-key">msg</span> }));
+
+  <span class="c-kw">return</span> res.<span class="c-fn">status</span>(<span class="c-num">422</span>).<span class="c-fn">json</span>({
+    <span class="c-key">success</span>: <span class="c-kw">false</span>,
+    <span class="c-key">message</span>: <span class="c-str">'Validation failed'</span>,
+    <span class="c-key">errors</span>,
+  });
+};
+
+module.exports = validate;</pre>
+    </div>
+
+    <h3>Quick Reference — Which HTTP status to use</h3>
+
+    <table class="compare">
+      <thead>
+        <tr><th>Situation</th><th>Avoid</th><th>Use instead</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="row-label">Validation failed (bad input format)</td>
+          <td class="local-val">400 Bad Request</td>
+          <td class="eks-val">422 Unprocessable Entity ✓</td>
+        </tr>
+        <tr>
+          <td class="row-label">Resource not found by valid ID</td>
+          <td class="local-val">422</td>
+          <td class="eks-val">404 Not Found ✓</td>
+        </tr>
+        <tr>
+          <td class="row-label">Unauthorised action</td>
+          <td class="local-val">422</td>
+          <td class="eks-val">403 Forbidden ✓</td>
+        </tr>
+        <tr>
+          <td class="row-label">Missing auth token</td>
+          <td class="local-val">422</td>
+          <td class="eks-val">401 Unauthorised ✓</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <hr class="divider">
+
+    <h3>Complete working example — User Registration route</h3>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-label">routes/auth.js — full register route</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+      <pre><span class="c-kw">const</span> express  = <span class="c-cmd">require</span>(<span class="c-str">'express'</span>);
+<span class="c-kw">const</span> bcrypt   = <span class="c-cmd">require</span>(<span class="c-str">'bcrypt'</span>);
+<span class="c-kw">const</span> User     = <span class="c-cmd">require</span>(<span class="c-str">'../models/User'</span>);
+<span class="c-kw">const</span> validate = <span class="c-cmd">require</span>(<span class="c-str">'../middleware/validate'</span>);
+<span class="c-kw">const</span> { body } = <span class="c-cmd">require</span>(<span class="c-str">'express-validator'</span>);
+
+<span class="c-kw">const</span> router = express.<span class="c-fn">Router</span>();
+
+<span class="c-kw">const</span> registerValidators = [
+  <span class="c-fn">body</span>(<span class="c-str">'name'</span>)
+    .<span class="c-fn">trim</span>()
+    .<span class="c-fn">notEmpty</span>().<span class="c-fn">withMessage</span>(<span class="c-str">'Name is required'</span>)
+    .<span class="c-fn">isLength</span>({ <span class="c-flag">min</span>: <span class="c-num">2</span>, <span class="c-flag">max</span>: <span class="c-num">50</span> }).<span class="c-fn">withMessage</span>(<span class="c-str">'2–50 characters only'</span>),
+
+  <span class="c-fn">body</span>(<span class="c-str">'email'</span>)
+    .<span class="c-fn">normalizeEmail</span>()
+    .<span class="c-fn">isEmail</span>().<span class="c-fn">withMessage</span>(<span class="c-str">'Enter a valid email'</span>).<span class="c-fn">bail</span>()
+    .<span class="c-fn">custom</span>(<span class="c-kw">async</span> (email) => {
+      <span class="c-kw">if</span> (<span class="c-kw">await</span> User.<span class="c-fn">findOne</span>({ email })) <span class="c-kw">throw new</span> Error(<span class="c-str">'Already registered'</span>);
+    }),
+
+  <span class="c-fn">body</span>(<span class="c-str">'password'</span>)
+    .<span class="c-fn">isStrongPassword</span>({ <span class="c-flag">minLength</span>: <span class="c-num">8</span>, <span class="c-flag">minNumbers</span>: <span class="c-num">1</span>, <span class="c-flag">minSymbols</span>: <span class="c-num">1</span> })
+    .<span class="c-fn">withMessage</span>(<span class="c-str">'8+ chars, 1 number, 1 symbol required'</span>),
+
+  <span class="c-fn">body</span>(<span class="c-str">'confirmPassword'</span>)
+    .<span class="c-fn">custom</span>((val, { req }) => {
+      <span class="c-kw">if</span> (val !== req.body.password) <span class="c-kw">throw new</span> Error(<span class="c-str">'Passwords do not match'</span>);
+      <span class="c-kw">return true</span>;
+    }),
+];
+
+router.<span class="c-fn">post</span>(<span class="c-str">'/register'</span>, registerValidators, validate, <span class="c-kw">async</span> (req, res) => {
+  <span class="c-kw">const</span> { name, email, password } = req.body;  <span class="c-comment">// already sanitized</span>
+  <span class="c-kw">const</span> hashed = <span class="c-kw">await</span> bcrypt.<span class="c-fn">hash</span>(password, <span class="c-num">10</span>);
+  <span class="c-kw">const</span> user = <span class="c-kw">await</span> User.<span class="c-fn">create</span>({ name, email, password: hashed });
+  res.<span class="c-fn">status</span>(<span class="c-num">201</span>).<span class="c-fn">json</span>({ <span class="c-key">success</span>: <span class="c-kw">true</span>, <span class="c-key">userId</span>: user._id });
+});
+
+module.exports = router;</pre>
+    </div>
+
+    <div class="note">
+      <div class="note-icon">💡</div>
+      <p>Because sanitizers ran before the controller, <strong><code>req.body.email</code> is already normalized</strong> (lowercased, Gmail dots removed). You save it directly — no extra processing needed.</p>
+    </div>
+
+  </section>
+
+  <footer>
+    <span>Sheryians Coding School · express-validator Notes</span>
+    <span>v7.x · Node.js · Express.js · validator.js</span>
+  </footer>
+
+</main>
+</div>
+
+<script>
+  function copyCode(btn) {
+    const pre = btn.closest('.code-wrap').querySelector('pre');
+    const text = pre.innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'copied!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'copy';
+        btn.classList.remove('copied');
+      }, 1800);
+    });
+  }
+
+  // Active nav on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('nav a[href^="#"]');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.getAttribute('id');
+        navLinks.forEach(link => {
+          link.classList.toggle('active', link.getAttribute('href') === `#${id}`);
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -75% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
