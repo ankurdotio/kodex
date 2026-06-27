@@ -34,3 +34,14 @@ export const getUserByEmailOrUsername = async ({ email, username }) => {
 
     return user;
 }
+
+
+/**
+ * Retrieves a user by the provided userId.
+ * @param {string} userId - The ID of the user to retrieve.
+ * @returns {Promise<Object|null>} - The retrieved user object or null if not found.
+ */
+export const getUserById = async (userId) => {
+    const user = await userModel.findById(userId);
+    return user;
+}

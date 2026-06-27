@@ -21,3 +21,34 @@ export const generateRefreshToken = (userId) => {
     const refreshToken = jwt.sign({ userId }, config.JWT_REFRESH_TOKEN_SECRET, { expiresIn: '7d' });
     return refreshToken;
 }
+
+
+/**
+ * Verifies the provided JWT access token.
+ * @param {string} token - The JWT access token to verify.
+ * @returns {Object} - The decoded payload of the verified token.
+ * @throws {Error} - Throws an error if the token is invalid or expired.
+ */
+export const verifyAccessToken = (token) => {
+    try {
+        const decoded = jwt.verify(token, config.JWT_ACCESS_TOKEN_SECRET);
+        return decoded;
+    } catch (error) {
+        throw new Error('Invalid or expired access token');
+    }
+}
+
+/**
+ * Verifies the provided JWT refresh token.
+ * @param {string} token - The JWT refresh token to verify.
+ * @returns {Object} - The decoded payload of the verified token.
+ * @throws {Error} - Throws an error if the token is invalid or expired.
+ */
+export const verifyRefreshToken = (token) => {
+    try {
+        const decoded = jwt.verify(token, config.JWT_REFRESH_TOKEN_SECRET);
+        return decoded;
+    } catch (error) {
+        throw new Error('Invalid or expired refresh token');
+    }
+}
