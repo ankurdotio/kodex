@@ -3,6 +3,8 @@ import type { UserResponse } from "./user";
 export type AccessTokenPayload = {
   userId: string;
   email: string;
+  name: string;
+  verified: boolean;
   type: "access";
 };
 
@@ -15,13 +17,11 @@ export type RefreshTokenPayload = {
 export type AuthSuccessResponse = {
   message: string;
   accessToken: string;
-  refreshToken: string;
   user: UserResponse;
 };
 
 export type RefreshTokenResponse = {
   message: string;
   accessToken: string;
-  refreshToken: string;
   user: UserResponse;
 };

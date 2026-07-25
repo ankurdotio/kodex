@@ -1,0 +1,14 @@
+node_modules
+client/node_modules
+server/node_modules
+client/dist
+server/public
+.git
+.env
+client/.env
+server/.env
+*.md
+docker-compose*.yml
+render.yaml
+.opencode
+.vscode

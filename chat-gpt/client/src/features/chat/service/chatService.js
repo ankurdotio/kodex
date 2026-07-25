@@ -5,4 +5,13 @@ export const chatService = {
   listSessions() {
     return httpClient.get('/chat/sessions')
   },
+  getMessages(conversationId) {
+    return httpClient.get(`/chat/conversation/${conversationId}/messages`)
+  },
+  createSession(message) {
+    return httpClient.post('/chat/session/create', { message })
+  },
+  deleteSession(conversationId) {
+    return httpClient.delete(`/chat/conversation/${conversationId}`)
+  },
 }

@@ -5,19 +5,24 @@ import {
   logout,
   refresh,
   register,
-  resetPassword
+  resetPassword,
+  verifyEmail,
+  resendVerification,
+  logoutAll,
+  me
 } from "../controllers/auth.controller";
 import {
   forgotPasswordValidation,
   loginValidation,
   registerValidation,
-  resetPasswordValidation
+  resetPasswordValidation,
+  verifyEmailValidation,
+  resendVerificationValidation
 } from "../validations/auth.validation";
 import { validateRequest } from "../validations/validate-request";
+import { authUserMiddleware } from "../middlewares/auth-user.middleware";
 
 const authRouter = Router();
-
-
 
 /**
  * POST /api/v1/auth/register
@@ -52,5 +57,24 @@ authRouter.post(
   validateRequest,
   resetPassword
 );
+
+authRouter.post(
+  "/verify-email",
+  verifyEmailValidation,
+  validateRequest,
+  verifyEmail
+);
+
+authRouter.post(
+  "/resend-verification",
+  resendVerificationValidation,
+  validateRequest,
+  resendVerification
+);
+
+authRouter.get("/me", authUserMiddleware, me);
+
+authRouter.post("/logout-all", authUserMiddleware, logoutAll);
+authRouter.post("/logout/all", authUserMiddleware, logoutAll); // Alias
 
 export { authRouter };

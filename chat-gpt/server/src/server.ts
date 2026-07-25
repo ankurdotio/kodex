@@ -1,18 +1,19 @@
 import { app } from "./app/app";
 import { connectDb } from "./config/db";
-import { env } from "./config/env";
+import env from "./config/env.js";
+import logger from "./config/logger.js"
 
 async function bootstrap() {
   await connectDb();
 
-  app.listen(env.port, () => {
+  app.listen(env.PORT, () => {
     // eslint-disable-next-line no-console
-    console.log(`Server is running on http://localhost:${env.port}`);
+    logger.info(`Server is running on http://localhost:${env.PORT}`);
   });
 }
 
 bootstrap().catch((error) => {
   // eslint-disable-next-line no-console
-  console.error("Failed to bootstrap server", error);
+  logger.error( {err: error} ,"Failed to bootstrap server");
   process.exit(1);
 });

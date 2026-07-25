@@ -26,6 +26,18 @@ const userSchema = new Schema(
     resetPasswordExpiresAt: {
       type: Date,
       default: null
+    },
+    verified: {
+      type: Boolean,
+      default: false
+    },
+    verificationOtpHash: {
+      type: String,
+      default: null
+    },
+    verificationOtpExpiresAt: {
+      type: Date,
+      default: null
     }
   },
   { timestamps: true }

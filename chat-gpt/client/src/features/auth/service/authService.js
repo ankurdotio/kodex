@@ -16,6 +16,12 @@ export const authService = {
   resetPassword(payload) {
     return httpClient.post('/auth/reset-password', payload)
   },
+  verifyEmail(payload) {
+    return httpClient.post('/auth/verify-email', payload)
+  },
+  resendVerification(payload) {
+    return httpClient.post('/auth/resend-verification', payload)
+  },
   refreshToken(payload = {}) {
     return httpClient.post('/auth/refresh', payload, {
       skipAuthRefresh: true,

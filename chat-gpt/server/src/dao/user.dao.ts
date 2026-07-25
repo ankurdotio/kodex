@@ -1,7 +1,7 @@
 import { UserModel } from "./models/user.model";
 
 class UserDao {
-  async createUser(input: { name: string; email: string; passwordHash: string }) {
+  async createUser(input: { name: string; email: string; passwordHash: string; verified?: boolean }) {
     const user = await UserModel.create(input);
     return user;
   }
@@ -21,7 +21,7 @@ class UserDao {
         resetPasswordTokenHash: tokenHash,
         resetPasswordExpiresAt: expiresAt
       },
-      { new: true }
+      { returnDocument: 'after' }
     );
   }
 
@@ -40,7 +40,30 @@ class UserDao {
         resetPasswordTokenHash: null,
         resetPasswordExpiresAt: null
       },
-      { new: true }
+      { returnDocument: 'after' }
+    );
+  }
+
+  async setVerificationOtp(userId: string, otpHash: string, expiresAt: Date) {
+    return UserModel.findByIdAndUpdate(
+      userId,
+      {
+        verificationOtpHash: otpHash,
+        verificationOtpExpiresAt: expiresAt
+      },
+      { returnDocument: 'after' }
+    );
+  }
+
+  async markEmailAsVerified(userId: string) {
+    return UserModel.findByIdAndUpdate(
+      userId,
+      {
+        verified: true,
+        verificationOtpHash: null,
+        verificationOtpExpiresAt: null
+      },
+      { returnDocument: 'after' }
     );
   }
 }

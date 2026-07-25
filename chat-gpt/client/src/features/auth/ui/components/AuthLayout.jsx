@@ -2,15 +2,15 @@ import { Link } from 'react-router-dom'
 
 export function AuthLayout({ title, subtitle, children, footerText, footerLink, footerLabel }) {
   return (
-    <div className="min-h-screen bg-white px-4 py-6 text-[#0D0D0D] dark:bg-[#212121] dark:text-[#ECECEC] flex items-center content-center">
-      <div className="mx-auto w-full max-w-[460px] rounded-2xl border border-[#E5E5E5] bg-[#F7F7F8] p-6 dark:border-[#3A3A3A] dark:bg-[#2F2F2F]">
-        <h1 className="text-[30px] font-semibold tracking-tight">{title}</h1>
-        <p className="mt-3 text-[15px] leading-relaxed text-[#6E6E80] dark:text-[#A9A9B3]">{subtitle}</p>
-        {children}
-        <div className="mt-3 flex items-center gap-2 text-sm text-[#6E6E80] dark:text-[#A9A9B3]">
+    <div className="min-h-screen bg-[#09090B] px-4 py-6 text-[#FAFAFA] flex items-center justify-center">
+      <div className="w-full max-w-[440px] rounded-xl border border-[#27272A] bg-[#18181B] p-8 shadow-2xl">
+        <h1 className="text-2xl font-bold tracking-tight text-white">{title}</h1>
+        <p className="mt-2 text-sm text-[#A1A1AA]">{subtitle}</p>
+        <div className="mt-6">{children}</div>
+        <div className="mt-6 flex items-center justify-center gap-1.5 text-xs text-[#A1A1AA] border-t border-[#27272A] pt-4">
           <span>{footerText}</span>
           <Link
-            className="font-medium text-[#10A37F] transition-colors hover:text-[#1A7F64]"
+            className="font-semibold text-white transition-colors hover:text-[#D4D4D8] hover:underline"
             to={footerLink}
           >
             {footerLabel}

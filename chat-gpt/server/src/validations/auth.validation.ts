@@ -25,3 +25,12 @@ export const resetPasswordValidation = [
     .isLength({ min: 8 })
     .withMessage("New password must be at least 8 characters")
 ];
+
+export const verifyEmailValidation = [
+  body("email").isEmail().withMessage("Valid email is required"),
+  body("otp").isString().isLength({ min: 6, max: 6 }).withMessage("OTP must be 6 digits")
+];
+
+export const resendVerificationValidation = [
+  body("email").isEmail().withMessage("Valid email is required")
+];

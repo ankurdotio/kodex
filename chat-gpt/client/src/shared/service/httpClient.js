@@ -28,7 +28,7 @@ function queueRefresh() {
     refreshPromise = httpClient
       .post(REFRESH_URL, {}, { skipAuthRefresh: true })
       .then((response) => {
-        const token = response?.data?.accessToken || null
+        const token = response?.data?.data?.accessToken || null
         setAccessToken(token)
         return token
       })

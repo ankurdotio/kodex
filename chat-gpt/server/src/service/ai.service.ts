@@ -1,16 +1,16 @@
 import { ChatMistralAI } from "@langchain/mistralai"
 import { createAgent, HumanMessage } from "langchain"
-import { env } from "../config/env"
+import env from "../config/env.js"
 import * as z from "zod"
 import { model } from "mongoose"
 
 const smallModel = new ChatMistralAI({
     model: "mistral-small-latest",
-    apiKey: env.mistralApiKey
+    apiKey: env.MISTRAL_API_KEY
 })
 const mediumModel = new ChatMistralAI({
     model: "mistral-medium-latest",
-    apiKey: env.mistralApiKey
+    apiKey: env.MISTRAL_API_KEY
 })
 
 export async function getConversationTitle({ message }: { message: string }): Promise<string> {

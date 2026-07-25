@@ -1,19 +1,19 @@
 import jwt from "jsonwebtoken";
-import { env } from "../config/env";
+import env from "../config/env.js";
 import type { AccessTokenPayload, RefreshTokenPayload } from "../types/auth";
 
 const accessTokenOptions: jwt.SignOptions = {
-  expiresIn: env.accessTokenTtl as jwt.SignOptions["expiresIn"]
+  expiresIn: env.ACCESS_TOKEN_TTL as jwt.SignOptions["expiresIn"]
 };
 
 const refreshTokenOptions: jwt.SignOptions = {
-  expiresIn: env.refreshTokenTtl as jwt.SignOptions["expiresIn"]
+  expiresIn: env.REFRESH_TOKEN_TTL as jwt.SignOptions["expiresIn"]
 };
 
 export function signAccessToken(payload: Omit<AccessTokenPayload, "type">): string {
   return jwt.sign(
     { ...payload, type: "access" },
-    env.jwtAccessSecret,
+    env.JWT_ACCESS_SECRET,
     accessTokenOptions
   );
 }
@@ -21,15 +21,15 @@ export function signAccessToken(payload: Omit<AccessTokenPayload, "type">): stri
 export function signRefreshToken(payload: Omit<RefreshTokenPayload, "type">): string {
   return jwt.sign(
     { ...payload, type: "refresh" },
-    env.jwtRefreshSecret,
+    env.JWT_REFRESH_SECRET,
     refreshTokenOptions
   );
 }
 
 export function verifyAccessToken(token: string): AccessTokenPayload {
-  return jwt.verify(token, env.jwtAccessSecret) as AccessTokenPayload;
+  return jwt.verify(token, env.JWT_ACCESS_SECRET) as AccessTokenPayload;
 }
 
 export function verifyRefreshToken(token: string): RefreshTokenPayload {
-  return jwt.verify(token, env.jwtRefreshSecret) as RefreshTokenPayload;
+  return jwt.verify(token, env.JWT_REFRESH_SECRET) as RefreshTokenPayload;
 }

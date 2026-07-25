@@ -1,0 +1,55 @@
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: chatgpt-mongodb
+    command: mongod --quiet --logpath /dev/null
+    ports:
+      - "27019:27017"
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  server:
+    image: node:20-alpine
+    container_name: chatgpt-server
+    working_dir: /app/server
+    command: node ../scripts/watch-package.js npm run dev -- -L
+    volumes:
+      - .:/app
+      - server_node_modules:/app/server/node_modules
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./server/.env
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - MONGODB_URI=mongodb://mongodb:27017/chatgpt_clone
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+  client:
+    image: node:20-alpine
+    container_name: chatgpt-client
+    working_dir: /app/client
+    command: node ../scripts/watch-package.js npm run dev -- --host
+    volumes:
+      - .:/app
+      - client_node_modules:/app/client/node_modules
+    ports:
+      - "5173:5173"
+    environment:
+      - BACKEND_URL=http://server:3000
+    depends_on:
+      - server
+
+volumes:
+  server_node_modules:
+  client_node_modules:
+  mongodb_data:

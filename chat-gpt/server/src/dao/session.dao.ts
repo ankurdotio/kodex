@@ -29,7 +29,7 @@ class SessionDao {
     return SessionModel.findByIdAndUpdate(
       sessionId,
       { isRevoked: true },
-      { new: true }
+      { returnDocument: 'after' }
     );
   }
 

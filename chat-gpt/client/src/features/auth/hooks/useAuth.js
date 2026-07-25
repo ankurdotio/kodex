@@ -27,10 +27,11 @@ export function useAuth() {
         async (payload) => {
             dispatch(authStart())
             try {
-                const { data } = await authService.register(payload)
-                setAccessToken(data.accessToken)
-                dispatch(authSuccess({ user: data.user, accessToken: data.accessToken }))
-                return { ok: true, data }
+                const { data: resBody } = await authService.register(payload)
+                const payloadData = resBody.data
+                setAccessToken(payloadData.accessToken)
+                dispatch(authSuccess({ user: payloadData.user, accessToken: payloadData.accessToken }))
+                return { ok: true, data: resBody }
             } catch (error) {
                 const message = parseError(error)
                 dispatch(authFailure(message))
@@ -44,10 +45,11 @@ export function useAuth() {
         async (payload) => {
             dispatch(authStart())
             try {
-                const { data } = await authService.login(payload)
-                setAccessToken(data.accessToken)
-                dispatch(authSuccess({ user: data.user, accessToken: data.accessToken }))
-                return { ok: true, data }
+                const { data: resBody } = await authService.login(payload)
+                const payloadData = resBody.data
+                setAccessToken(payloadData.accessToken)
+                dispatch(authSuccess({ user: payloadData.user, accessToken: payloadData.accessToken }))
+                return { ok: true, data: resBody }
             } catch (error) {
                 const message = parseError(error)
                 dispatch(authFailure(message))
@@ -59,9 +61,10 @@ export function useAuth() {
 
     const refresh = useCallback(async () => {
         try {
-            const { data } = await authService.refreshToken()
-            setAccessToken(data.accessToken)
-            dispatch(tokenUpdated({ accessToken: data.accessToken, user: data.user }))
+            const { data: resBody } = await authService.refreshToken()
+            const payloadData = resBody.data
+            setAccessToken(payloadData.accessToken)
+            dispatch(tokenUpdated({ accessToken: payloadData.accessToken, user: payloadData.user }))
             return true
         } catch {
             setAccessToken(null)
@@ -79,9 +82,10 @@ export function useAuth() {
         if (!bootstrapPromise) {
             bootstrapPromise = (async () => {
                 try {
-                    const { data } = await authService.refreshToken()
-                    setAccessToken(data.accessToken)
-                    dispatch(authSuccess({ user: data.user, accessToken: data.accessToken }))
+                    const { data: resBody } = await authService.refreshToken()
+                    const payloadData = resBody.data
+                    setAccessToken(payloadData.accessToken)
+                    dispatch(authSuccess({ user: payloadData.user, accessToken: payloadData.accessToken }))
                     return true
                 } catch {
                     setAccessToken(null)
@@ -112,9 +116,9 @@ export function useAuth() {
         async (payload) => {
             dispatch(authStart())
             try {
-                const { data } = await authService.forgotPassword(payload)
+                const { data: resBody } = await authService.forgotPassword(payload)
                 dispatch(clearAuthError())
-                return { ok: true, data }
+                return { ok: true, data: resBody }
             } catch (error) {
                 const message = parseError(error)
                 dispatch(authFailure(message))
@@ -122,6 +126,55 @@ export function useAuth() {
             }
         },
         [ dispatch ],
+    )
+
+    const resetPassword = useCallback(
+        async (payload) => {
+            dispatch(authStart())
+            try {
+                const { data: resBody } = await authService.resetPassword(payload)
+                dispatch(clearAuthError())
+                return { ok: true, data: resBody }
+            } catch (error) {
+                const message = parseError(error)
+                dispatch(authFailure(message))
+                return { ok: false, message }
+            }
+        },
+        [ dispatch ],
+    )
+
+    const verifyEmail = useCallback(
+        async (payload) => {
+            dispatch(authStart())
+            try {
+                const { data: resBody } = await authService.verifyEmail(payload)
+                const payloadData = resBody.data
+                if (payloadData && payloadData.accessToken) {
+                    setAccessToken(payloadData.accessToken)
+                    dispatch(authSuccess({ user: payloadData.user, accessToken: payloadData.accessToken }))
+                }
+                return { ok: true, message: resBody.message }
+            } catch (error) {
+                const message = parseError(error)
+                dispatch(authFailure(message))
+                return { ok: false, message }
+            }
+        },
+        [ dispatch ],
+    )
+
+    const resendVerification = useCallback(
+        async (payload) => {
+            try {
+                const { data: resBody } = await authService.resendVerification(payload)
+                return { ok: true, message: resBody.message }
+            } catch (error) {
+                const message = parseError(error)
+                return { ok: false, message }
+            }
+        },
+        [],
     )
 
     return {
@@ -132,6 +185,9 @@ export function useAuth() {
         refresh,
         bootstrapSession,
         forgotPassword,
+        resetPassword,
+        verifyEmail,
+        resendVerification,
         clearError: () => dispatch(clearAuthError()),
     }
 }
