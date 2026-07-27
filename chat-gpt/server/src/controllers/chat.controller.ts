@@ -100,8 +100,13 @@ export const chatController = asyncHandler(async (req: Request<{}, {}, RequestMe
         conversation: conversationId
     })
 
+    const messages = await messageDao.findMessagesByConversation(conversationId);
 
-    const stream = await getStream({ message });
+
+
+
+
+    const stream = await getStream({ messages, userId: user.userId });
 
 
     res.setHeader("Content-Type", "text/event-stream");
@@ -110,13 +115,16 @@ export const chatController = asyncHandler(async (req: Request<{}, {}, RequestMe
     res.setHeader("X-Conversation-Id", conversationId);
     res.setHeader("X-Conversation-Title", encodeURIComponent(conversationTitle));
 
-    let aiMessage:string = "";
-    
-    for await (const chunk of stream) {
-        res.write(`data: ${JSON.stringify(chunk.text)}\n\n`);
+    let aiMessage: string = "";
 
-        aiMessage += chunk.text;
-        
+    for await (const [token, metadata] of stream) {
+
+        if (token.getType() === "ai") {
+            res.write(`data: ${JSON.stringify(token.text)}\n\n`);
+
+            aiMessage += token.text;
+        }
+
     }
 
 
