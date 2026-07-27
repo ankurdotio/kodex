@@ -60,6 +60,12 @@ export function useAuth() {
     const refresh = useCallback(async () => {
         try {
             const { data } = await authService.refreshToken()
+            if (!data?.accessToken) {
+                setAccessToken(null)
+                dispatch(logoutSuccess())
+                dispatch(clearSessions())
+                return false
+            }
             setAccessToken(data.accessToken)
             dispatch(tokenUpdated({ accessToken: data.accessToken, user: data.user }))
             return true
@@ -80,6 +86,12 @@ export function useAuth() {
             bootstrapPromise = (async () => {
                 try {
                     const { data } = await authService.refreshToken()
+                    if (!data?.accessToken) {
+                        setAccessToken(null)
+                        dispatch(logoutSuccess())
+                        dispatch(clearSessions())
+                        return false
+                    }
                     setAccessToken(data.accessToken)
                     dispatch(authSuccess({ user: data.user, accessToken: data.accessToken }))
                     return true

@@ -23,6 +23,10 @@ export function setAccessToken(token) {
   delete httpClient.defaults.headers.common.Authorization
 }
 
+export function getAccessToken() {
+  return accessToken
+}
+
 function queueRefresh() {
   if (!refreshPromise) {
     refreshPromise = httpClient

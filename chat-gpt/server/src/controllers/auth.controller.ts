@@ -138,7 +138,8 @@ export const refresh = asyncHandler(async (req: Request, res: Response) => {
     (req.body.refreshToken ? String(req.body.refreshToken) : "");
 
   if (!incomingToken) {
-    throw new ApiError(401, "Refresh token is required");
+    res.status(204).send();
+    return;
   }
 
   const payload = verifyRefreshToken(incomingToken);

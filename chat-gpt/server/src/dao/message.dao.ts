@@ -14,6 +14,10 @@ class MessageDAO {
         return message;
     }
 
+    async findMessagesByConversation(conversation: string) {
+        return MessageModel.find({ conversation }).sort({ createdAt: 1 }).lean();
+    }
+
 }
 
 export const messageDao = new MessageDAO();
