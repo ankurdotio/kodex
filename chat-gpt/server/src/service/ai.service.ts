@@ -4,7 +4,7 @@ import { env } from "../config/env"
 import * as z from "zod"
 import { model } from "mongoose"
 import { MongoMessage } from "../types/chat"
-import { getMemoryTool, updateMemoryTool } from "./ai/tools.js"
+import { getMemoryTool, updateMemoryTool, getWebResultTool } from "./ai/tools.js"
 
 const smallModel = new ChatMistralAI({
     model: "mistral-small-latest",
@@ -38,26 +38,35 @@ export async function getConversationTitle({ message }: { message: string }): Pr
 export async function getStream({ messages, userId }: { messages: MongoMessage[], userId: string }): Promise<ReadableStream> {
 
     const agent = createAgent({
-        model: mediumModel,
-        tools: [getMemoryTool, updateMemoryTool],
+        model: smallModel,
+        tools: [getMemoryTool, updateMemoryTool, getWebResultTool],
         systemPrompt: `
         Read memory context to make the conversation more personalized.
         Mandatory: Update the memory whenever you notice a fact that will be relevant for weeks/months and then respond to the user.
+        
+        Use the web search tool to look up information on the web when you don't know the answer to a question. Always use the web search tool when you are unsure about an answer. If you find relevant information, use it to respond to the user. If you don't find relevant information, respond with "I couldn't find any relevant information on that topic."
 
-         current userid ${userId}`
+        Current Date: ${new Date().toISOString().split("T")[0]}
+        
+        `
     })
 
-    const stream = await agent.stream({
-        messages: messages.map((message) => {
-            if (message.author === "user") {
-                return new HumanMessage(message.content)
-            } else {
-                return new AIMessage(message.content)
+    const stream = await agent.stream(
+        {
+            messages: messages.map((message) => {
+                if (message.author === "user") {
+                    return new HumanMessage(message.content)
+                } else {
+                    return new AIMessage(message.content)
+                }
+            })
+        },
+        {   
+            streamMode: ["messages", "values"],
+            configurable: {
+                userId: userId
             }
-        })
-    }, {
-        streamMode: "messages",
-    }
+        }
     )
     return stream
 }

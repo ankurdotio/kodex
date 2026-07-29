@@ -9,15 +9,23 @@ const messageSchema = new Schema({
     },
     author: {
         type: String,
-        enum: ["user", "ai"],
+        enum: ["user", "ai", "tool"],
         default: "user",
     },
-    content:{
+    content: {
         type: String,
         required: true,
         trim: true,
         minlength: 1
-    }
+    },
+    toolCalls: [
+        {
+            arguments: Object,
+            id: String,
+            name: String,
+        }
+    ],
+    toolCallId: String,
 }, {
     timestamps: true
 });

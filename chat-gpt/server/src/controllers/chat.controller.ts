@@ -117,12 +117,24 @@ export const chatController = asyncHandler(async (req: Request<{}, {}, RequestMe
 
     let aiMessage: string = "";
 
-    for await (const [token, metadata] of stream) {
+    for await (const [mode, data] of stream) {
 
-        if (token.getType() === "ai") {
-            res.write(`data: ${JSON.stringify(token.text)}\n\n`);
 
-            aiMessage += token.text;
+
+        if (mode === "messages") {
+
+            const [token, metadata] = data;
+
+            if (token.getType() === "ai") {
+                res.write(`data: ${JSON.stringify(token.text)}\n\n`);
+
+                aiMessage += token.text;
+            }
+
+        } else if (mode === "values") {
+
+            console.log("Received values:", data);
+            
         }
 
     }
