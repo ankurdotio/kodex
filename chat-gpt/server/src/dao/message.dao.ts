@@ -9,7 +9,13 @@ class MessageDAO {
 
         const { content, author, conversation } = messageData;
 
-        const message = await MessageModel.create({ content, author, conversation });
+        const message = await MessageModel.create({
+            content,
+            author,
+            conversation,
+            toolCallId: messageData.toolCallId,
+            toolCalls: messageData.toolCalls,
+        });
 
         return message;
     }
@@ -21,7 +27,9 @@ class MessageDAO {
             author: message.author,
             conversation: message.conversation.toString(),
             createdAt: message.createdAt,
-            updatedAt: message.updatedAt
+            updatedAt: message.updatedAt,
+            toolCallId: message.toolCallId,
+            toolCalls: message.toolCalls,
         }));
     }
 

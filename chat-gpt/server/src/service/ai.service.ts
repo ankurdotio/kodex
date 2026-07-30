@@ -1,5 +1,5 @@
 import { ChatMistralAI } from "@langchain/mistralai"
-import { createAgent, HumanMessage, AIMessage } from "langchain"
+import { createAgent, HumanMessage, AIMessage, ToolMessage } from "langchain"
 import { env } from "../config/env"
 import * as z from "zod"
 import { model } from "mongoose"
@@ -56,12 +56,24 @@ export async function getStream({ messages, userId }: { messages: MongoMessage[]
             messages: messages.map((message) => {
                 if (message.author === "user") {
                     return new HumanMessage(message.content)
+                } else if (message.author === "ai") {
+                    return new AIMessage({
+                        content: message.content,
+                        tool_calls: message.toolCalls?.map((toolCall) => ({
+                            name: toolCall.name || "",
+                            args: toolCall.arguments || {},
+                            id: toolCall.id || ""
+                        }))
+                    })
                 } else {
-                    return new AIMessage(message.content)
+                    return new ToolMessage({
+                        content: message.content,
+                        tool_call_id: message.toolCallId || "",
+                    })
                 }
             })
         },
-        {   
+        {
             streamMode: ["messages", "values"],
             configurable: {
                 userId: userId
