@@ -1,5 +1,5 @@
 import { tavily } from "@tavily/core"
-import { env } from "../config/env"
+import { env } from "../config/env.js"
 
 const tvly = tavily({ apiKey: env.tvlyApiKey });
 

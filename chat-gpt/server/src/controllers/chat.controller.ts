@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
-import { asyncHandler } from "../utils/async-handler";
-import { RequestMessage } from "../types/chat";
-import { getConversationTitle, getStream } from "../service/ai.service";
-import { conversationDao } from "../dao/conversation.dao";
-import { messageDao } from "../dao/message.dao";
-import { ApiError } from "../utils/api-error";
+import { asyncHandler } from "../utils/async-handler.js";
+import { RequestMessage } from "../types/chat.js";
+import { getConversationTitle, getStream } from "../service/ai.service.js";
+import { conversationDao } from "../dao/conversation.dao.js";
+import { messageDao } from "../dao/message.dao.js";
+import { ApiError } from "../utils/api-error.js";
 import { HumanMessage, AIMessage, ToolMessage, AIMessageChunk } from "langchain";
 
 export const listConversations = asyncHandler(async (req: Request, res: Response): Promise<void> => {

@@ -6,14 +6,14 @@ import {
   refresh,
   register,
   resetPassword
-} from "../controllers/auth.controller";
+} from "../controllers/auth.controller.js";
 import {
   forgotPasswordValidation,
   loginValidation,
   registerValidation,
   resetPasswordValidation
-} from "../validations/auth.validation";
-import { validateRequest } from "../validations/validate-request";
+} from "../validations/auth.validation.js";
+import { validateRequest } from "../validations/validate-request.js";
 
 const authRouter = Router();
 

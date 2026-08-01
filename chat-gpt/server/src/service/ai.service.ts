@@ -1,6 +1,6 @@
 import { ChatMistralAI } from "@langchain/mistralai"
 import { createAgent, HumanMessage, AIMessage, ToolMessage } from "langchain"
-import { env } from "../config/env"
+import { env } from "../config/env.js"
 import * as z from "zod"
 import { model } from "mongoose"
 import { MongoMessage } from "../types/chat"

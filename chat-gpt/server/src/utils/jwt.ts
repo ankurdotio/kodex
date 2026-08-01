@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { env } from "../config/env";
+import { env } from "../config/env.js";
 import type { AccessTokenPayload, RefreshTokenPayload } from "../types/auth";
 
 const accessTokenOptions: jwt.SignOptions = {

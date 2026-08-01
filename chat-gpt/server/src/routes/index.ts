@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { authRouter } from "./auth.routes";
-import { chatRouter } from "./chat.routes";
+import { authRouter } from "./auth.routes.js";
+import { chatRouter } from "./chat.routes.js";
 
 
 const router = Router();

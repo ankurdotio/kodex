@@ -1,4 +1,4 @@
-import { UserModel } from "./models/user.model";
+import { UserModel } from "./models/user.model.js";
 
 class UserDao {
   async createUser(input: { name: string; email: string; passwordHash: string }) {

@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { chatController, getConversation, listConversations } from "../controllers/chat.controller";
-import { authUserMiddleware } from "../middlewares/auth-user.middleware";
-import { conversationIdValidation, sendMessageValidation } from "../validations/chat.validation";
-import { validateRequest } from "../validations/validate-request";
+import { chatController, getConversation, listConversations } from "../controllers/chat.controller.js";
+import { authUserMiddleware } from "../middlewares/auth-user.middleware.js";
+import { conversationIdValidation, sendMessageValidation } from "../validations/chat.validation.js";
+import { validateRequest } from "../validations/validate-request.js";
 
 
 const chatRouter = Router();

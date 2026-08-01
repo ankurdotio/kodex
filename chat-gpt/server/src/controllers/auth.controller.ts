@@ -1,29 +1,29 @@
 import type { Request, Response } from "express";
 import { Types } from "mongoose";
-import { env, isProduction } from "../config/env";
-import { userDao } from "../dao/user.dao";
-import { sessionDao } from "../dao/session.dao";
-import { ApiError } from "../utils/api-error";
-import { asyncHandler } from "../utils/async-handler";
+import { env, isProduction } from "../config/env.js";
+import { userDao } from "../dao/user.dao.js";
+import { sessionDao } from "../dao/session.dao.js";
+import { ApiError } from "../utils/api-error.js";
+import { asyncHandler } from "../utils/async-handler.js";
 import {
   comparePassword,
   generateRandomToken,
   hashPassword,
   sha256
-} from "../utils/crypto";
+} from "../utils/crypto.js";
 import {
   signAccessToken,
   signRefreshToken,
   verifyRefreshToken
-} from "../utils/jwt";
+} from "../utils/jwt.js";
 import type {
   ForgotPasswordRequest,
   LoginUserRequest,
   RegisterUserRequest,
   ResetPasswordRequest,
   UserResponse
-} from "../types/user";
-import type { AuthSuccessResponse, RefreshTokenResponse } from "../types/auth";
+} from "../types/user.js";
+import type { AuthSuccessResponse, RefreshTokenResponse } from "../types/auth.js";
 
 function cookieOptions() {
   return {

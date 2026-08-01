@@ -1,10 +1,10 @@
-import { app } from "./app/app";
-import { connectDb } from "./config/db";
-import { env } from "./config/env";
+import { app } from "./app/app.js";
+import { connectDb } from "./config/db.js";
+import { env } from "./config/env.js";
 
 async function bootstrap() {
-  await connectDb();
-
+  
+  connectDb();
   app.listen(env.port, () => {
     // eslint-disable-next-line no-console
     console.log(`Server is running on http://localhost:${env.port}`);

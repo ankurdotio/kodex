@@ -1,4 +1,4 @@
-import { SessionModel } from "./models/session.model";
+import { SessionModel } from "./models/session.model.js";
 
 class SessionDao {
   async createSession(input: {
