@@ -1,0 +1,2610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Microservices — Codex Batch Notes | Sheryians Coding School</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Fraunces:ital,wght@0,300;0,600;0,700;0,900;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ── Design Tokens ── */
+:root {
+  --ink:       #0E0F14;
+  --paper:     #F5F2EB;
+  --paper2:    #EDE9DF;
+  --paper3:    #E4DFD3;
+  --rule:      #D4CEBC;
+  --muted:     #6B6455;
+  --accent:    #C84B1F;
+  --accent2:   #1A6B4A;
+  --accent3:   #1B4587;
+  --gold:      #B8860B;
+  --code-bg:   #1A1C24;
+  --code-text: #E2DCCC;
+  --flag-c:    #5BA4CF;
+  --val-c:     #F4A261;
+}
+
+/* ── Typography & Resets ── */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background-color: var(--paper);
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* ── Keyframes ── */
+@keyframes fadeUp     { from { opacity:0; transform: translateY(16px);} to { opacity:1; transform: translateY(0);} }
+@keyframes slideInLeft{ from { opacity:0; transform: translateX(-40px);} to { opacity:1; transform: translateX(0);} }
+@keyframes slideInRight{from { opacity:0; transform: translateX(40px);} to { opacity:1; transform: translateX(0);} }
+@keyframes floatPulse { 0%,100% { transform: translateY(0);} 50% { transform: translateY(-8px);} }
+@keyframes dataFlow   { from { stroke-dashoffset: 200; } to { stroke-dashoffset: 0; } }
+
+.animate-fade-up     { animation: fadeUp 0.4s ease both; }
+.animate-slide-left  { animation: slideInLeft 0.5s ease both; }
+.animate-slide-right { animation: slideInRight 0.5s ease both; }
+.animate-float-pulse { animation: floatPulse 2.5s ease-in-out infinite; }
+.animate-data-flow   { animation: dataFlow 1.5s linear infinite; }
+
+/* ── Layout ── */
+.layout-container { display: flex; min-height: 100vh; }
+.sidebar {
+  width: 260px; flex-shrink: 0;
+  background-color: var(--ink);
+  position: sticky; top: 0; height: 100vh;
+  overflow-y: auto; padding: 32px 0 40px;
+}
+.main-content { flex: 1; max-width: calc(100% - 260px); padding: 56px 56px 80px; }
+
+/* ── Sidebar ── */
+.nav-brand { padding: 0 24px; margin-bottom: 24px; }
+.nav-brand .logo { font-family:'Fraunces',serif; font-size:18px; font-weight:700; color:#FFF; }
+.nav-brand .logo .accent-dot { color: var(--accent); }
+.nav-brand .sub { font-family:'IBM Plex Mono',monospace; font-size:10px; color:rgba(255,255,255,.35); letter-spacing:.06em; margin-top:2px; }
+.nav-group-label {
+  font-family:'IBM Plex Mono',monospace; font-size:9px; color:rgba(255,255,255,.25);
+  letter-spacing:.12em; text-transform:uppercase; padding:0 24px; margin-top:16px; margin-bottom:4px;
+}
+.nav-link {
+  display:flex; align-items:center; gap:8px; padding:10px 24px;
+  font-family:'DM Sans',sans-serif; font-size:12.5px; color:rgba(255,255,255,.5);
+  border-left:2px solid transparent; text-decoration:none;
+  transition: color 150ms ease, background-color 150ms ease;
+}
+.nav-link:hover { color:#FFF; background-color:rgba(255,255,255,.04); }
+.nav-link.active { color:#FFF; border-left-color:var(--accent); background-color:rgba(200,75,31,.08); }
+.nav-num {
+  width:18px; height:18px; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  background-color:rgba(255,255,255,.08); font-family:'IBM Plex Mono',monospace; font-size:9px;
+  border-radius:4px; color:inherit;
+}
+.nav-link:hover .nav-num, .nav-link.active .nav-num { background-color: var(--accent); color:#FFF; }
+
+/* ── Hero ── */
+.hero { margin-bottom:64px; padding-bottom:40px; border-bottom:2px solid var(--rule); }
+.hero-eyebrow { font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--accent); text-transform:uppercase; letter-spacing:.12em; }
+.hero h1 { font-family:'Fraunces',serif; font-size:clamp(36px,5vw,58px); font-weight:900; color:var(--ink); line-height:1.05; letter-spacing:-.02em; margin:14px 0 0; }
+.hero h1 em { font-style:normal; color:var(--accent); }
+.hero-desc { font-family:'DM Sans',sans-serif; font-size:16px; color:var(--muted); max-width:620px; line-height:1.65; margin-top:18px; }
+.hero-tags { display:flex; flex-wrap:wrap; gap:8px; margin-top:24px; }
+.hero-tag { font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--muted); border:1px solid var(--rule); border-radius:9999px; padding:2px 12px; }
+
+/* ── Sections ── */
+.section-block { margin-bottom:72px; scroll-margin-top:24px; }
+.section-header { display:flex; align-items:flex-start; gap:16px; margin-bottom:28px; }
+.section-header-text { padding-top:4px; }
+.section-num-big { font-family:'Fraunces',serif; font-size:48px; font-weight:900; color:var(--rule); user-select:none; line-height:1; }
+.section-title { font-family:'Fraunces',serif; font-size:26px; font-weight:700; color:var(--ink); line-height:1.2; }
+.section-subtitle { font-family:'DM Sans',sans-serif; font-size:13px; color:var(--muted); margin-top:4px; }
+
+h3 { font-family:'Fraunces',serif; font-size:18px; font-weight:600; color:var(--ink); margin-top:28px; margin-bottom:12px; }
+h4 { font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; margin-top:24px; margin-bottom:8px; }
+p  { font-family:'DM Sans',sans-serif; font-size:14.5px; color:#2A2720; line-height:1.7; margin-bottom:12px; }
+ul, ol { font-family:'DM Sans',sans-serif; font-size:14.5px; color:#2A2720; line-height:1.7; padding-left:20px; }
+li { margin-bottom:6px; }
+strong { font-weight:500; color: var(--ink); }
+code, .inline-code {
+  font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--accent);
+  background-color:var(--paper3); border:1px solid var(--rule); border-radius:4px; padding:2px 4px;
+}
+
+/* ── Concept / Note / Warning ── */
+.concept-box { background-color:var(--paper2); border-left:3px solid var(--accent3); border-radius:0 8px 8px 0; padding:16px 20px; margin:16px 0; }
+.concept-box-label { font-family:'IBM Plex Mono',monospace; font-size:9px; color:var(--accent3); text-transform:uppercase; letter-spacing:.12em; margin-bottom:8px; }
+.concept-box-text { font-family:'DM Sans',sans-serif; font-size:14px; color:var(--ink); line-height:1.65; margin:0; }
+
+.note-box { background-color:#FEF9EC; border:1px solid #EDD97A; border-radius:8px; padding:12px 16px; margin:16px 0; display:flex; gap:12px; align-items:flex-start; }
+.note-box-icon { font-size:18px; line-height:1; margin-top:2px; }
+.note-box-text { font-family:'DM Sans',sans-serif; font-size:13px; color:#5C4A00; margin:0; }
+.note-box-text strong { color:#3D3000; }
+
+.warning-box { background-color:#FEF2F2; border:1px solid #FCA5A5; border-radius:8px; padding:12px 16px; margin:16px 0; display:flex; gap:12px; align-items:flex-start; }
+.warning-box-icon { font-size:18px; line-height:1; margin-top:2px; }
+.warning-box-text { font-family:'DM Sans',sans-serif; font-size:13px; color:#7F1D1D; margin:0; }
+.warning-box-text strong { color:#5C1010; }
+
+/* ── Badges ── */
+.badge { display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:10px; font-weight:600; color:#FFF; text-transform:uppercase; letter-spacing:.06em; padding:2px 10px; border-radius:4px; margin-bottom:8px; }
+.badge-accent { background-color:var(--accent); }
+.badge-green  { background-color:var(--accent2); }
+.badge-blue   { background-color:var(--accent3); }
+.badge-gold   { background-color:var(--gold); }
+
+/* ── Code Block ── */
+.code-block { border-radius:8px; overflow:hidden; border:1px solid rgba(255,255,255,.06); margin:16px 0; }
+.code-header { display:flex; align-items:center; justify-content:space-between; padding:8px 16px; background-color:#13141A; border-bottom:1px solid rgba(255,255,255,.06); }
+.code-label { font-family:'IBM Plex Mono',monospace; font-size:10px; color:rgba(255,255,255,.4); text-transform:uppercase; letter-spacing:.08em; }
+.code-copy-btn { background:none; border:none; font-family:'IBM Plex Mono',monospace; font-size:10px; color:rgba(255,255,255,.3); text-transform:uppercase; letter-spacing:.06em; cursor:pointer; transition:color 150ms ease; }
+.code-copy-btn:hover { color:rgba(255,255,255,.7); }
+.code-pre { background-color:var(--code-bg); color:var(--code-text); font-family:'IBM Plex Mono',monospace; font-size:12.5px; line-height:1.75; padding:16px 20px; overflow-x:auto; margin:0; }
+
+.token-command  { color:#87CEEB; font-weight:bold; }
+.token-flag     { color:#5BA4CF; }
+.token-val      { color:#F4A261; }
+.token-string   { color:#98C379; }
+.token-comment  { color:rgba(255,255,255,.3); font-style:italic; }
+.token-yaml-key { color:#C678DD; }
+.token-operator { color:#E5C07B; }
+
+/* ── Tables ── */
+.flag-table { width:100%; border-collapse:collapse; font-family:'DM Sans',sans-serif; font-size:14px; margin:16px 0; }
+.flag-table th { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; background-color:var(--paper3); text-align:left; padding:8px 12px; border:1px solid var(--rule); }
+.flag-table td { padding:8px 12px; border:1px solid var(--rule); font-size:13.5px; vertical-align:top; }
+.flag-table tbody tr { transition:background-color 100ms ease; }
+.flag-table tbody tr:hover { background-color:var(--paper2); }
+.flag-name { font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:600; color:var(--flag-c); }
+.flag-val  { font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--val-c); }
+
+.compare-table { width:100%; border-collapse:collapse; font-family:'DM Sans',sans-serif; font-size:14px; margin:16px 0; border-radius:8px; overflow:hidden; }
+.compare-table th { background-color:var(--ink); color:#FFF; font-size:13px; font-weight:600; text-align:left; padding:12px 16px; border:1px solid var(--ink); }
+.compare-table td { font-size:13px; padding:12px 16px; border:1px solid var(--rule); vertical-align:top; }
+.compare-table tbody tr { transition:background-color 100ms ease; }
+.compare-table tbody tr:hover { background-color:var(--paper2); }
+.compare-table .cell-title { font-weight:600; color:var(--ink); }
+.compare-table .cell-muted { color:var(--muted); }
+.compare-table .cell-highlight { color:var(--accent2); font-weight:500; }
+.compare-table .cell-bad { color:var(--accent); }
+.table-scroll { overflow-x:auto; }
+
+/* ── Flow Diagram ── */
+.flow-diagram { display:flex; flex-direction:column; gap:0; margin:16px 0; }
+.flow-step { display:flex; gap:16px; }
+.flow-connector { display:flex; flex-direction:column; align-items:center; }
+.flow-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; margin-top:4px; }
+.flow-dot-accent { background-color:var(--accent); }
+.flow-dot-green  { background-color:var(--accent2); }
+.flow-dot-blue   { background-color:var(--accent3); }
+.flow-dot-gold   { background-color:var(--gold); }
+.flow-line { width:2px; background-color:var(--rule); flex:1; margin:4px 0; }
+.flow-content { padding-bottom:16px; }
+.flow-title { font-family:'DM Sans',sans-serif; font-size:14px; font-weight:600; color:var(--ink); }
+.flow-desc { font-family:'DM Sans',sans-serif; font-size:12.5px; color:var(--muted); margin-top:2px; }
+
+/* ── Scale Diagram ── */
+.scale-diagram { background-color:var(--paper2); border:1px solid var(--rule); border-radius:10px; padding:16px 20px; margin:16px 0; font-family:'IBM Plex Mono',monospace; font-size:12px; line-height:2; color:var(--muted); overflow-x:auto; white-space:pre; }
+.scale-diagram .highlight { color:var(--ink); font-weight:bold; }
+.scale-diagram .green { color:var(--accent2); }
+.scale-diagram .red   { color:var(--accent); }
+.scale-diagram .blue  { color:var(--accent3); }
+
+.divider { border:none; border-top:1px solid var(--rule); margin:40px 0; }
+
+/* ── Quiz ── */
+.quiz-box { background-color:var(--ink); border-radius:12px; padding:24px; margin:32px 0; border:1px solid rgba(255,255,255,.08); }
+.quiz-question { font-family:'DM Sans',sans-serif; font-size:15px; color:#FFF; font-weight:500; line-height:1.6; margin-bottom:20px; }
+.quiz-options { display:flex; flex-direction:column; gap:12px; }
+.quiz-option { text-align:left; font-family:'DM Sans',sans-serif; font-size:13.5px; color:rgba(255,255,255,.7); background:transparent; border:1px solid rgba(255,255,255,.12); border-radius:8px; padding:12px 16px; cursor:pointer; transition:all 200ms ease; }
+.quiz-option:hover:not(:disabled) { border-color:var(--accent); color:#FFF; background-color:rgba(200,75,31,.08); }
+.quiz-option.correct { border-color:var(--accent2)!important; background-color:rgba(26,107,74,.15)!important; color:#FFF!important; opacity:1!important; }
+.quiz-option.incorrect { border-color:var(--accent)!important; background-color:rgba(200,75,31,.15)!important; color:#FFF!important; opacity:1!important; }
+.quiz-feedback { margin-top:16px; font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:.08em; }
+.quiz-feedback.correct { color:var(--accent2); }
+.quiz-feedback.incorrect { color:var(--accent); }
+.quiz-feedback.hidden { display:none; }
+
+/* ── Footer ── */
+.site-footer { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--muted); border-top:2px solid var(--rule); padding-top:16px; margin-top:64px; }
+
+/* ══════════════════════════════════════
+   INTERACTIVE DIAGRAM SHELL
+   ══════════════════════════════════════ */
+.diagram-shell { border:1px solid var(--rule); border-radius:12px; background-color:var(--paper2); margin:24px 0; overflow:hidden; }
+.diagram-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 18px; background-color:var(--paper3); border-bottom:1px solid var(--rule); flex-wrap:wrap; }
+.diagram-name { font-family:'IBM Plex Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); }
+.diagram-stepname { font-family:'Fraunces',serif; font-size:15px; font-weight:600; color:var(--ink); }
+.diagram-stage { padding:8px 10px 0; }
+.diagram-stage svg { width:100%; height:auto; display:block; }
+.diagram-caption { font-family:'DM Sans',sans-serif; font-size:13.5px; color:#2A2720; padding:4px 18px 14px; line-height:1.65; min-height:44px; }
+.diagram-caption b { color:var(--ink); font-weight:500; }
+
+.diagram-controls { display:flex; align-items:center; gap:10px; padding:12px 18px; border-top:1px solid var(--rule); background-color:var(--paper3); }
+.dg-btn { font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink); background-color:var(--paper); border:1px solid var(--rule); border-radius:6px; padding:6px 14px; cursor:pointer; transition:all 150ms ease; }
+.dg-btn:hover:not(:disabled) { background-color:var(--accent); border-color:var(--accent); color:#FFF; }
+.dg-btn:disabled { opacity:.35; cursor:not-allowed; }
+.dg-counter { font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--muted); letter-spacing:.06em; }
+.dg-track { flex:1; height:3px; background-color:var(--rule); border-radius:2px; overflow:hidden; min-width:40px; }
+.dg-track span { display:block; height:100%; background-color:var(--accent); width:0; transition:width 300ms ease; }
+
+/* metrics strip */
+.metric-strip { display:grid; grid-template-columns:repeat(6,1fr); gap:1px; background-color:var(--rule); border-top:1px solid var(--rule); }
+.metric-cell { background-color:var(--paper2); padding:10px 12px; }
+.metric-k { font-family:'IBM Plex Mono',monospace; font-size:8.5px; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); }
+.metric-v { font-family:'IBM Plex Mono',monospace; font-size:14px; font-weight:600; color:var(--ink); margin-top:2px; transition:color 250ms ease; }
+.metric-v.warn { color:var(--gold); }
+.metric-v.bad  { color:var(--accent); }
+.metric-v.ok   { color:var(--accent2); }
+
+/* SVG primitives */
+.svg-box { fill:var(--paper); stroke:var(--rule); stroke-width:1.5; }
+.svg-box-ink { fill:var(--ink); stroke:var(--ink); }
+.svg-label { font-family:'DM Sans',sans-serif; font-size:11px; fill:var(--ink); font-weight:500; }
+.svg-label-sm { font-family:'IBM Plex Mono',monospace; font-size:8px; fill:var(--muted); letter-spacing:.08em; text-transform:uppercase; }
+.svg-label-w { font-family:'DM Sans',sans-serif; font-size:11px; fill:#FFF; font-weight:500; }
+.svg-label-wsm { font-family:'IBM Plex Mono',monospace; font-size:8px; fill:rgba(255,255,255,.5); letter-spacing:.08em; }
+.svg-mono { font-family:'IBM Plex Mono',monospace; font-size:9px; fill:var(--muted); }
+
+.wire { fill:none; stroke:var(--rule); stroke-width:2; }
+.wire-flow { fill:none; stroke:var(--accent3); stroke-width:2.2; stroke-dasharray:7 193; stroke-dashoffset:200; opacity:0; }
+.wire-flow.live { opacity:1; animation:dataFlow 1.5s linear infinite; }
+.wire-flow.live.green { stroke:var(--accent2); }
+.wire-flow.live.hot { stroke:var(--accent); animation-duration:.7s; }
+.wire.dim { opacity:.35; }
+
+.node { transition: opacity 300ms ease; }
+.node.dim { opacity:.28; }
+.node-shell { fill:var(--paper); stroke:var(--rule); stroke-width:1.5; transition: fill 350ms ease, stroke 350ms ease; }
+.node-shell.on   { stroke:var(--accent3); }
+.node-shell.ok   { fill:#E9F2ED; stroke:var(--accent2); }
+.node-shell.hot  { fill:#FBECE6; stroke:var(--accent); }
+.node-shell.dead { fill:#FEF2F2; stroke:var(--accent); stroke-dasharray:4 3; }
+
+.user-dot { fill:var(--rule); transition: fill 250ms ease; }
+.user-dot.on { fill:var(--accent3); }
+.user-dot.hot { fill:var(--accent); }
+
+/* arrows (request storm) */
+.arrow { fill:var(--accent3); }
+.arrow.err { fill:var(--accent); }
+@keyframes arrowFly {
+  0%   { transform: translate(var(--x0), var(--ay)) scaleX(1); opacity:0; }
+  8%   { opacity:1; }
+  100% { transform: translate(var(--x1), var(--ay)) scaleX(1); opacity:1; }
+}
+@keyframes arrowBounce {
+  0%   { transform: translate(var(--x0), var(--ay)); opacity:0; }
+  8%   { opacity:1; }
+  62%  { transform: translate(var(--xh), var(--ay)); opacity:1; }
+  100% { transform: translate(var(--x0), var(--ay)); opacity:0; }
+}
+.arrow-fly    { animation: arrowFly var(--dur,.55s) linear forwards; }
+.arrow-bounce { animation: arrowBounce var(--dur,.7s) ease-in-out forwards; }
+
+@keyframes serverShake {
+  0%,100% { transform: translate(0,0); }
+  25%     { transform: translate(1.6px,-1.2px); }
+  50%     { transform: translate(-1.4px,1.4px); }
+  75%     { transform: translate(1.2px,1px); }
+}
+.shaking { animation: serverShake .18s linear infinite; }
+
+/* queue bars */
+.q-bar-bg { fill:var(--paper3); }
+.q-bar { fill:var(--accent2); transition: width 500ms ease, fill 400ms ease; }
+.q-bar.piling { fill:var(--gold); }
+.q-bar.full { fill:var(--accent); }
+
+/* misc helpers */
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:16px 0; }
+.mini-card { background-color:var(--paper2); border:1px solid var(--rule); border-radius:10px; padding:14px 16px; }
+.mini-card h5 { font-family:'Fraunces',serif; font-size:15px; font-weight:600; margin:0 0 6px; color:var(--ink); }
+.mini-card p { font-size:13px; margin:0; color:var(--muted); }
+.pill-row { display:flex; flex-wrap:wrap; gap:6px; margin:12px 0; }
+.pill { font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--muted); border:1px solid var(--rule); background:var(--paper2); border-radius:9999px; padding:3px 11px; }
+.rule-card { border:1px solid var(--rule); border-radius:10px; padding:16px 18px; margin:12px 0; background:var(--paper2); }
+.rule-card .rule-n { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--accent); letter-spacing:.1em; }
+.rule-card h5 { font-family:'Fraunces',serif; font-size:16px; font-weight:600; margin:4px 0 6px; color:var(--ink); }
+.rule-card p { font-size:13.5px; margin:0; }
+.verdict { border:2px solid var(--accent2); border-radius:12px; padding:18px 22px; margin:20px 0; background:#E9F2ED; }
+.verdict .verdict-label { font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent2); }
+.verdict h4 { font-family:'Fraunces',serif; font-size:19px; font-weight:700; color:var(--ink); text-transform:none; letter-spacing:0; margin:6px 0 8px; }
+.verdict p { margin:0; font-size:14px; }
+
+@media (max-width: 900px) {
+  .layout-container { flex-direction:column; }
+  .sidebar { width:100%; height:auto; position:static; padding:20px 0 16px; }
+  .main-content { max-width:100%; padding:32px 24px 64px; }
+  .nav-links-wrap { display:flex; overflow-x:auto; gap:4px; padding:0 16px; }
+  .nav-link { border-left:none; border-bottom:2px solid transparent; white-space:nowrap; padding:8px 12px; }
+  .nav-link.active { border-left-color:transparent; border-bottom-color:var(--accent); }
+  .nav-group-label { display:none; }
+  .metric-strip { grid-template-columns:repeat(3,1fr); }
+  .two-col { grid-template-columns:1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration:.01ms!important; animation-iteration-count:1!important; transition-duration:.01ms!important; }
+  html { scroll-behavior:auto; }
+}
+</style>
+</head>
+<body>
+<div class="layout-container">
+
+<!-- ══════════════ SIDEBAR ══════════════ -->
+<nav class="sidebar">
+  <div class="nav-brand">
+    <div class="logo">Micro<span class="accent-dot">.</span>Services</div>
+    <div class="sub">Sheryians · Codex Batch</div>
+  </div>
+
+  <div class="nav-links-wrap">
+    <div class="nav-group-label">Start Here</div>
+    <a href="#breaking"   class="nav-link active"><span class="nav-num">1</span>Watch It Break</a>
+
+    <div class="nav-group-label">Foundation</div>
+    <a href="#benefits"   class="nav-link"><span class="nav-num">2</span>Why Microservices</a>
+    <a href="#problem"    class="nav-link"><span class="nav-num">3</span>The Problem</a>
+    <a href="#rules"      class="nav-link"><span class="nav-num">4</span>The Rules</a>
+
+    <div class="nav-group-label">Migration</div>
+    <a href="#decide"     class="nav-link"><span class="nav-num">5</span>When To Split</a>
+
+    <div class="nav-group-label">The Solution</div>
+    <a href="#solution"   class="nav-link"><span class="nav-num">7</span>The Architecture</a>
+    <a href="#gateway-lb" class="nav-link"><span class="nav-num">8</span>Gateway vs LB</a>
+    <a href="#our-stack"  class="nav-link"><span class="nav-num">9</span>What We Will Use</a>
+
+    <div class="nav-group-label">Async</div>
+    <a href="#broker"     class="nav-link"><span class="nav-num">10</span>Message Broker</a>
+    <a href="#rabbitmq"   class="nav-link"><span class="nav-num">11</span>RabbitMQ In Practice</a>
+    <a href="#recap"      class="nav-link"><span class="nav-num">12</span>Recap &amp; Checklist</a>
+  </div>
+</nav>
+
+<!-- ══════════════ MAIN ══════════════ -->
+<main class="main-content">
+
+<!-- HERO -->
+<div class="hero animate-fade-up">
+  <div class="hero-eyebrow">Codex Batch · Backend Architecture</div>
+  <h1>Microservices:<br>breaking <em>one big box</em><br>into many small ones</h1>
+  <p class="hero-desc">
+    Everyone can draw the boxes-and-arrows diagram. Almost nobody can explain <em>why</em> the boxes
+    exist. These notes start at the pain — the night your single server stops answering — and work
+    forward from there. By the end you will know what a monolith cannot do, what an API gateway
+    actually does that a load balancer does not, and why a queue sitting between two services
+    is the difference between one slow endpoint and a dead product.
+  </p>
+  <div class="hero-tags">
+    <span class="hero-tag">Node.js</span>
+    <span class="hero-tag">Express</span>
+    <span class="hero-tag">API Gateway</span>
+    <span class="hero-tag">Load Balancer</span>
+    <span class="hero-tag">RabbitMQ / AMQP</span>
+    <span class="hero-tag">AWS EKS · ap-southeast-1</span>
+  </div>
+</div>
+
+<!-- ══════════════ 01 · WATCH IT BREAK ══════════════ -->
+<section class="section-block animate-fade-up" id="breaking">
+  <div class="section-header">
+    <div class="section-num-big">01</div>
+    <div class="section-header-text">
+      <div class="section-title">Watch a monolith break</div>
+      <div class="section-subtitle">Seven steps from a normal Tuesday to a full outage. Step through it.</div>
+    </div>
+  </div>
+
+  <p>
+    Each arrow below is one HTTP request. Use
+    <strong>Forward</strong> to advance through the incident.
+  </p>
+
+  <div class="diagram-shell" id="dg-mono">
+    <div class="diagram-head">
+      <span class="diagram-name">Incident replay · single deploy unit</span>
+      <span class="diagram-stepname" id="mono-title">Tuesday, 4:00 PM — a normal day</span>
+    </div>
+
+    <div class="diagram-stage">
+      <svg viewBox="0 0 760 300" role="img" aria-label="Users sending requests to a single monolithic server under increasing load">
+        <!-- USERS -->
+        <text class="svg-label-sm" x="22" y="24">Users</text>
+        <g id="mono-users"></g>
+
+        <!-- flight lane guides -->
+        <line x1="158" y1="42" x2="490" y2="42" stroke="var(--rule)" stroke-width="1" stroke-dasharray="2 5" opacity="0.5"/>
+        <line x1="158" y1="248" x2="490" y2="248" stroke="var(--rule)" stroke-width="1" stroke-dasharray="2 5" opacity="0.5"/>
+        <text class="svg-label-sm" x="250" y="34" id="mono-lane">HTTP requests</text>
+
+        <!-- arrows layer -->
+        <g id="mono-arrows"></g>
+
+        <!-- ghost replicas (revealed at the last step) -->
+        <g id="mono-ghosts" opacity="0">
+          <rect x="516" y="33" width="200" height="190" rx="10" fill="var(--paper)" stroke="var(--rule)" stroke-width="1.5" opacity="0.55"/>
+          <rect x="508" y="39" width="200" height="190" rx="10" fill="var(--paper)" stroke="var(--rule)" stroke-width="1.5" opacity="0.75"/>
+          <text class="svg-label-sm" x="628" y="28" id="mono-xn">× 5 replicas</text>
+        </g>
+
+        <!-- MONOLITH -->
+        <g id="mono-server">
+          <rect id="mono-box" class="node-shell" x="500" y="45" width="200" height="190" rx="10"/>
+          <text class="svg-label" x="516" y="68" font-weight="600">MONOLITH</text>
+          <text class="svg-label-sm" x="516" y="82">one process · one deploy</text>
+
+          <rect class="mod-chip" data-mod="auth"    x="514" y="92"  width="172" height="22" rx="5" fill="var(--paper2)" stroke="var(--rule)"/>
+          <text class="svg-mono" x="524" y="107">/auth</text>
+          <text class="svg-mono mod-state" data-mod="auth" x="660" y="107" text-anchor="end" fill="var(--accent2)">ok</text>
+
+          <rect class="mod-chip" data-mod="orders"  x="514" y="118" width="172" height="22" rx="5" fill="var(--paper2)" stroke="var(--rule)"/>
+          <text class="svg-mono" x="524" y="133">/orders</text>
+          <text class="svg-mono mod-state" data-mod="orders" x="660" y="133" text-anchor="end" fill="var(--accent2)">ok</text>
+
+          <rect class="mod-chip" data-mod="catalog" x="514" y="144" width="172" height="22" rx="5" fill="var(--paper2)" stroke="var(--rule)"/>
+          <text class="svg-mono" x="524" y="159">/catalog</text>
+          <text class="svg-mono mod-state" data-mod="catalog" x="660" y="159" text-anchor="end" fill="var(--accent2)">ok</text>
+
+          <rect class="mod-chip" data-mod="media"   x="514" y="170" width="172" height="22" rx="5" fill="var(--paper2)" stroke="var(--rule)"/>
+          <text class="svg-mono" x="524" y="185">/media/upload</text>
+          <text class="svg-mono mod-state" data-mod="media" x="660" y="185" text-anchor="end" fill="var(--accent2)">ok</text>
+
+          <rect class="mod-chip" data-mod="reports" x="514" y="196" width="172" height="22" rx="5" fill="var(--paper2)" stroke="var(--rule)"/>
+          <text class="svg-mono" x="524" y="211">/reports</text>
+          <text class="svg-mono mod-state" data-mod="reports" x="660" y="211" text-anchor="end" fill="var(--accent2)">ok</text>
+        </g>
+
+        <!-- DB -->
+        <line x1="600" y1="235" x2="600" y2="250" class="wire"/>
+        <g id="mono-db">
+          <ellipse cx="600" cy="252" rx="46" ry="8" fill="var(--paper)" stroke="var(--rule)" stroke-width="1.5"/>
+          <path d="M554,252 L554,276 A46,8 0 0,0 646,276 L646,252" fill="var(--paper)" stroke="var(--rule)" stroke-width="1.5"/>
+          <text class="svg-mono" x="600" y="272" text-anchor="middle">one database</text>
+        </g>
+
+        <!-- load meter -->
+        <text class="svg-label-sm" x="22" y="252">Load</text>
+        <rect x="22" y="260" width="122" height="8" rx="4" fill="var(--paper3)" stroke="var(--rule)" stroke-width="0.8"/>
+        <rect id="mono-load" x="22" y="260" width="12" height="8" rx="4" fill="var(--accent2)" style="transition:width 450ms ease, fill 450ms ease"/>
+      </svg>
+    </div>
+
+    <div class="diagram-caption" id="mono-caption"></div>
+
+    <div class="metric-strip">
+      <div class="metric-cell"><div class="metric-k">Concurrent users</div><div class="metric-v" id="m-users">120</div></div>
+      <div class="metric-cell"><div class="metric-k">Requests / sec</div><div class="metric-v" id="m-rps">400</div></div>
+      <div class="metric-cell"><div class="metric-k">p95 latency</div><div class="metric-v" id="m-p95">60ms</div></div>
+      <div class="metric-cell"><div class="metric-k">CPU</div><div class="metric-v" id="m-cpu">24%</div></div>
+      <div class="metric-cell"><div class="metric-k">DB pool</div><div class="metric-v" id="m-pool">6/20</div></div>
+      <div class="metric-cell"><div class="metric-k">Error rate</div><div class="metric-v" id="m-err">0.0%</div></div>
+    </div>
+
+    <div class="diagram-controls">
+      <button class="dg-btn" id="mono-back">← Back</button>
+      <button class="dg-btn" id="mono-fwd">Forward →</button>
+      <span class="dg-counter" id="mono-count">Step 1 / 7</span>
+      <span class="dg-track"><span id="mono-prog"></span></span>
+    </div>
+  </div>
+
+  <div class="concept-box">
+    <div class="concept-box-label">What you just watched</div>
+    <p class="concept-box-text">
+      Only <strong>one</strong> route was under real pressure: <code>/media/upload</code>.
+      Everything else — login, orders, catalog, reports — was doing almost nothing, and all of it
+      died anyway. The database was shared, the process was shared, the deploy was shared, so the
+      <em>failure</em> was shared. And the standard fix (five copies of the whole thing) multiplies
+      your bill by five to fix one-fifth of the app, while the single database quietly becomes the
+      next wall.
+    </p>
+  </div>
+
+  <div class="quiz-box">
+    <p class="quiz-question">In the replay, why did <code>/login</code> and <code>/orders</code> fail when only <code>/media/upload</code> was under load?</p>
+    <div class="quiz-options" id="quiz-brk-1">
+      <button onclick="answerQuiz('quiz-brk-1', this, false)" class="quiz-option">A &nbsp;—&nbsp; Because users stopped logging in during the traffic spike</button>
+      <button onclick="answerQuiz('quiz-brk-1', this, true)" class="quiz-option">B &nbsp;—&nbsp; Because they share one process, one event loop and one DB pool — coupled failure</button>
+    </div>
+    <div class="quiz-feedback hidden" id="quiz-brk-1-feedback"></div>
+  </div>
+
+  <div class="quiz-box">
+    <p class="quiz-question">Clients time out and automatically retry during an overload. What does this cause?</p>
+    <div class="quiz-options" id="quiz-brk-2">
+      <button onclick="answerQuiz('quiz-brk-2', this, true)" class="quiz-option">A &nbsp;—&nbsp; A retry storm — effective load multiplies while capacity is already falling, turning a slowdown into an outage</button>
+      <button onclick="answerQuiz('quiz-brk-2', this, false)" class="quiz-option">B &nbsp;—&nbsp; Faster recovery, since the server gets more chances to answer</button>
+    </div>
+    <div class="quiz-feedback hidden" id="quiz-brk-2-feedback"></div>
+  </div>
+</section>
+
+<!-- ══════════════ 02 · BENEFITS ══════════════ -->
+<section class="section-block animate-fade-up" id="benefits">
+  <div class="section-header">
+    <div class="section-num-big">02</div>
+    <div class="section-header-text">
+      <div class="section-title">Why anyone bothers</div>
+      <div class="section-subtitle">The six things microservices buy you — and the one thing they cost</div>
+    </div>
+  </div>
+
+  <p>
+    Before the problem, the promise. Microservices are not an aesthetic choice and they are not
+    "the modern way to write code". They are a trade you make to buy six specific abilities.
+    If you do not need any of these six, you do not need microservices.
+  </p>
+
+  <div class="two-col">
+    <div class="mini-card">
+      <h5>1 · Deploy independently</h5>
+      <p>Ship the payment service at 3 PM without touching, testing, or redeploying the other eleven services. Release becomes a Tuesday, not an event.</p>
+    </div>
+    <div class="mini-card">
+      <h5>2 · Scale independently</h5>
+      <p>Image processing needs 20 pods. Login needs 2. In a monolith you pay for 20 copies of everything to get 20 copies of one thing.</p>
+    </div>
+    <div class="mini-card">
+      <h5>3 · Fail independently</h5>
+      <p>The recommendation engine dying should not stop people from checking out. Small blast radius instead of one shared fate.</p>
+    </div>
+    <div class="mini-card">
+      <h5>4 · Choose tech per job</h5>
+      <p>Node for the API, Python for the ML scoring, Go for the high-throughput ingest. Each service picks the right runtime and the right database.</p>
+    </div>
+    <div class="mini-card">
+      <h5>5 · Teams move in parallel</h5>
+      <p>Six teams, six repos, six deploy pipelines, no merge war. Team boundaries and service boundaries line up, so coordination cost drops.</p>
+    </div>
+    <div class="mini-card">
+      <h5>6 · Replace without rewriting</h5>
+      <p>A service is small enough to throw away. Rewriting a 4,000-line service is a sprint. Rewriting a 400,000-line monolith is a startup's death.</p>
+    </div>
+  </div>
+
+  <div class="warning-box">
+    <div class="warning-box-icon">⚠️</div>
+    <p class="warning-box-text">
+      <strong>And the cost, stated up front:</strong> you trade <em>code complexity</em> for
+      <em>operational complexity</em>. Function calls become network calls that can time out.
+      One transaction becomes five that can partially fail. One log file becomes twelve.
+      One deploy becomes twelve pipelines. Microservices do not remove complexity — they move it
+      from inside your codebase to between your codebases, where a debugger cannot reach it.
+    </p>
+  </div>
+
+  <div class="concept-box">
+    <div class="concept-box-label">The one-line test</div>
+    <p class="concept-box-text">
+      <strong>Microservices are an organisational solution before they are a technical one.</strong>
+      The core question is not "is my code too big?" — it is
+      "<strong>are too many people blocked on the same deploy?</strong>" If you are three developers
+      shipping one product, the honest answer is almost always: not yet.
+    </p>
+  </div>
+
+  <div class="quiz-box">
+    <p class="quiz-question">Your login endpoint gets 200 requests/sec and your video-transcoding endpoint gets 5. Both live in one monolith. What does the microservices split actually buy you here?</p>
+    <div class="quiz-options" id="quiz-ben-1">
+      <button onclick="answerQuiz('quiz-ben-1', this, false)" class="quiz-option">A &nbsp;—&nbsp; Faster code, because smaller files execute quicker</button>
+      <button onclick="answerQuiz('quiz-ben-1', this, true)" class="quiz-option">B &nbsp;—&nbsp; Independent scaling — you can run 20 transcoder pods and 2 login pods instead of 20 of everything</button>
+    </div>
+    <div class="quiz-feedback hidden" id="quiz-ben-1-feedback"></div>
+  </div>
+
+  <div class="quiz-box">
+    <p class="quiz-question">What is the honest cost of moving to microservices?</p>
+    <div class="quiz-options" id="quiz-ben-2">
+      <button onclick="answerQuiz('quiz-ben-2', this, true)" class="quiz-option">A &nbsp;—&nbsp; Code complexity is traded for operational complexity — network failures, partial transactions, distributed debugging</button>
+      <button onclick="answerQuiz('quiz-ben-2', this, false)" class="quiz-option">B &nbsp;—&nbsp; There is no real cost, only a higher cloud bill</button>
+    </div>
+    <div class="quiz-feedback hidden" id="quiz-ben-2-feedback"></div>
+  </div>
+</section>
+
+<!-- ══════════════ 03 · THE PROBLEM ══════════════ -->
+<section class="section-block animate-fade-up" id="problem">
+  <div class="section-header">
+    <div class="section-num-big">02</div>
+    <div class="section-header-text">
+      <div class="section-title">The problem, precisely</div>
+      <div class="section-subtitle">A monolith is not bad because it is big. It is bad because everything shares one fate.</div>
+    </div>
+  </div>
+
+  <p>
+    Picture the app you have already built in this batch. One Express repo. <code>routes/</code>,
+    <code>controllers/</code>, <code>models/</code>, one <code>.env</code>, one MongoDB, one
+    <code>npm start</code>. It works. It is genuinely the right way to start. So what breaks?
+  </p>
+
+  <p>
+    Not the file count. What breaks is that a monolith <strong>couples four things that should be
+    independent</strong>. Every pain you will ever feel comes from one of these four couplings.
+  </p>
+
+  <div class="flow-diagram">
+    <div class="flow-step">
+      <div class="flow-connector"><div class="flow-dot flow-dot-accent"></div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <div class="flow-title">1 · Coupled deployment — one change means one full redeploy</div>
+        <div class="flow-desc">You fixed a typo in the invoice PDF template. To ship it you rebuild, retest and restart the entire application, including checkout, auth and search. Every release is a company-wide risk, so releases get rarer, so each release gets bigger, so each release gets riskier. This loop is why teams end up shipping once a month and dreading it.</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-connector"><div class="flow-dot flow-dot-accent"></div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <div class="flow-title">2 · Coupled scaling — you can only scale the whole thing</div>
+        <div class="flow-desc">Your image-upload endpoint is CPU-heavy. Your login endpoint is trivial. There is no way to give one more resources without giving the other exactly the same. Horizontal scaling means duplicating 100% of the app — 100% of its memory, 100% of its DB connections — to relieve 5% of it.</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-connector"><div class="flow-dot flow-dot-accent"></div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <div class="flow-title">3 · Coupled failure — one bad line kills every feature</div>
+        <div class="flow-desc">One unhandled promise rejection, one memory leak in the PDF library, one <code>while</code> loop that never exits — the process dies and it takes login, checkout, search and everything else with it. In Node this is worse than in most runtimes: a single blocking operation stalls the event loop, so <em>every</em> in-flight request across <em>every</em> feature slows down together.</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-connector"><div class="flow-dot flow-dot-green"></div></div>
+      <div class="flow-content">
+        <div class="flow-title">4 · Coupled change — everyone edits the same repo</div>
+        <div class="flow-desc">Twelve developers, one <code>package.json</code>, one test suite, one CI queue. Upgrading a library for one feature forces a compatibility audit across all features. Merge conflicts become a daily tax. Onboarding takes three weeks because there is no "small part" to start with.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="concept-box">
+    <div class="concept-box-label">Key Concept</div>
+    <p class="concept-box-text">
+      <strong>The unit of deployment is the unit of failure and the unit of scale.</strong>
+      In a monolith all three are the same thing: the whole application. Microservices exist to
+      make that unit smaller. That is the entire idea. Everything else — gateways, brokers,
+      service discovery, tracing — is machinery you add to survive having made that unit smaller.
+    </p>
+  </div>
+
+  <h3>What a monolith is genuinely good at</h3>
+  <p>
+    Do not walk away thinking monoliths are a beginner mistake. Amazon's Prime Video team famously
+    moved a service <em>back</em> to a monolith and cut cost by ~90%. Shopify, GitHub and Stack Overflow
+    run enormous monoliths. Here is the honest scoreboard:
+  </p>
+
+  <div class="table-scroll">
+  <table class="compare-table">
+    <thead><tr><th>Concern</th><th>Monolith</th><th>Microservices</th></tr></thead>
+    <tbody>
+      <tr><td class="cell-title">Local setup</td><td class="cell-highlight">One repo, one command ✓</td><td class="cell-muted">Docker Compose with 8 containers, or mocks</td></tr>
+      <tr><td class="cell-title">A call between modules</td><td class="cell-highlight">Function call — nanoseconds, cannot fail ✓</td><td class="cell-muted">Network call — milliseconds, can time out</td></tr>
+      <tr><td class="cell-title">A transaction across modules</td><td class="cell-highlight">One DB transaction, ACID ✓</td><td class="cell-muted">Saga + compensating actions, eventually consistent</td></tr>
+      <tr><td class="cell-title">Debugging a request</td><td class="cell-highlight">One stack trace ✓</td><td class="cell-muted">Distributed tracing across 5 log streams</td></tr>
+      <tr><td class="cell-title">Refactoring a boundary</td><td class="cell-highlight">Rename in the IDE ✓</td><td class="cell-muted">Versioned API + coordinated rollout</td></tr>
+      <tr><td class="cell-title">Deploying one feature</td><td class="cell-muted">Redeploy everything</td><td class="cell-highlight">Deploy one service ✓</td></tr>
+      <tr><td class="cell-title">Scaling one hot path</td><td class="cell-muted">Duplicate the entire app</td><td class="cell-highlight">Scale one deployment ✓</td></tr>
+      <tr><td class="cell-title">Blast radius of a crash</td><td class="cell-muted">The whole product</td><td class="cell-highlight">One capability ✓</td></tr>
+      <tr><td class="cell-title">Team parallelism</td><td class="cell-muted">Shared repo, shared CI queue</td><td class="cell-highlight">Independent repos and pipelines ✓</td></tr>
+      <tr><td class="cell-title">Cost at small scale</td><td class="cell-highlight">One server ✓</td><td class="cell-muted">Cluster, gateway, broker, observability stack</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="note-box">
+    <div class="note-box-icon">💡</div>
+    <p class="note-box-text">
+      Read that table as a <strong>trade, not a verdict</strong>. The monolith column is stronger
+      at small scale, and the microservices column is stronger at team scale. The engineering
+      skill is knowing which row is currently hurting you most.
+    </p>
+  </div>
+
+  <div class="quiz-box">
+    <p class="quiz-question">In a Node.js monolith, one endpoint runs a heavy synchronous image resize. What happens to the unrelated <code>/login</code> endpoint?</p>
+    <div class="quiz-options" id="quiz-prob-1">
+      <button onclick="answerQuiz('quiz-prob-1', this, true)" class="quiz-option">A &nbsp;—&nbsp; It slows down too — the blocked event loop stalls every in-flight request in the process</button>
+      <button onclick="answerQuiz('quiz-prob-1', this, false)" class="quiz-option">B &nbsp;—&nbsp; Nothing — Node runs each route in its own thread</button>
+    </div>
+    <div class="quiz-feedback hidden" id="quiz-prob-1-feedback"></div>
+  </div>
+
+  <div class="quiz-box">
+    <p class="quiz-question">What is the real defining problem with a monolith?</p>
+    <div class="quiz-options" id="quiz-prob-2">
+      <button onclick="answerQuiz('quiz-prob-2', this, false)" class="quiz-option">A &nbsp;—&nbsp; The codebase has too many files and folders</button>
+      <button onclick="answerQuiz('quiz-prob-2', this, true)" class="quiz-option">B &nbsp;—&nbsp; Deployment, scaling and failure are all coupled to one unit — the whole app</button>
+    </div>
+    <div class="quiz-feedback hidden" id="quiz-prob-2-feedback"></div>
+  </div>
+</section>
+
+<!-- ══════════════ 04 · THE RULES ══════════════ -->
+<section class="section-block animate-fade-up" id="rules">
+  <div class="section-header">
+    <div class="section-num-big">05</div>
+    <div class="section-header-text">
+      <div class="section-title">The rules of microservices</div>
+      <div class="section-subtitle">Break these and you get a distributed monolith — all the cost, none of the benefit</div>
+    </div>
+  </div>
+
+  <p>
+    These are not style preferences. Each rule maps directly to one of the six benefits from
+    section 01. Break a rule and you lose the benefit it was protecting, while still paying the
+    operational bill.
+  </p>
+
+  <div class="rule-card">
+    <div class="rule-n">RULE 01</div>
+    <h5>One service = one business capability</h5>
+    <p>
+      Split by what the business does, not by technical layer. <code>order-service</code>,
+      <code>payment-service</code>, <code>notification-service</code> — never
+      <code>controller-service</code>, <code>database-service</code>, <code>validation-service</code>.
+      The test: can you describe the service in one sentence without using the word "and"?
+      If a product manager would recognise the name, the boundary is probably right.
+      In DDD terms this is a <em>bounded context</em>.
+    </p>
+  </div>
+
+  <div class="rule-card">
+    <div class="rule-n">RULE 02</div>
+    <h5>Own your data — no shared database</h5>
+    <p>
+      This is the rule people break first and regret longest. If <code>order-service</code> and
+      <code>user-service</code> both read and write the same <code>users</code> collection, then a
+      schema change in one breaks the other, and you can no longer deploy them independently.
+      You have built a distributed monolith. Each service owns its schema; the only way in is
+      through that service's API or events. Need user data inside orders? Store the tiny slice you
+      need (<code>userId</code>, <code>displayName</code>) as a local copy, kept fresh by events.
+    </p>
+  </div>
+
+  <div class="rule-card">
+    <div class="rule-n">RULE 03</div>
+    <h5>Independently deployable — the acid test</h5>
+    <p>
+      Can you deploy this service to production, on a Friday, without coordinating with any other
+      team and without deploying anything else? If the answer is no, it is not a microservice yet.
+      This single question catches almost every bad boundary.
+    </p>
+  </div>
+
+  <div class="rule-card">
+    <div class="rule-n">RULE 04</div>
+    <h5>Talk only over the network, only through contracts</h5>
+    <p>
+      No shared in-memory state, no shared session object, no reaching into another service's
+      Redis keys. Communication is an explicit, versioned contract: REST or gRPC for
+      request/response, AMQP events for fire-and-forget. The contract is the product; the
+      implementation behind it is nobody else's business.
+    </p>
+  </div>
+
+</section>
+
+<!-- ══════════════ 05 · WHEN TO SPLIT ══════════════ -->
+<section class="section-block animate-fade-up" id="decide">
+  <div class="section-header">
+    <div class="section-num-big">05</div>
+    <div class="section-header-text">
+      <div class="section-title">Monolith → microservices: how you decide</div>
+      <div class="section-subtitle">Not a vibe. A checklist, a set of prerequisites, and a migration pattern.</div>
+    </div>
+  </div>
+
+  <div class="concept-box">
+    <div class="concept-box-label">Default position</div>
+    <p class="concept-box-text">
+      <strong>Start with a modular monolith. Always.</strong> Martin Fowler calls this
+      "MonolithFirst". You do not know your domain boundaries on day one, and a wrong boundary in a
+      monolith is a refactor, while a wrong boundary in microservices is a migration. Build one
+      app with hard internal module walls — <code>modules/orders/</code>,
+      <code>modules/billing/</code>, each with its own service layer and no cross-imports — and
+      you have earned the right to split later, cheaply, along lines you have actually validated.
+    </p>
+  </div>
+
+  <h3>Signals that it is time</h3>
+  <p>You do not need all of these. Two or three that genuinely hurt is enough.</p>
+
+  <div class="table-scroll">
+  <table class="flag-table">
+    <thead><tr><th>Signal</th><th>What it looks like on a real team</th><th>Which benefit it unlocks</th></tr></thead>
+    <tbody>
+      <tr><td><span class="flag-name">Deploy fear</span></td><td>Releases happen monthly, at midnight, with four people watching. A one-line change requires a full regression.</td><td><span class="flag-val">Independent deploy</span></td></tr>
+      <tr><td><span class="flag-name">10× scale mismatch</span></td><td>One module needs 10× the CPU or memory of the rest, and you are over-provisioning the whole app to feed it.</td><td><span class="flag-val">Independent scaling</span></td></tr>
+      <tr><td><span class="flag-name">Shared-fate outages</span></td><td>A non-critical feature has taken down checkout more than once.</td><td><span class="flag-val">Fault isolation</span></td></tr>
+      <tr><td><span class="flag-name">Team collision</span></td><td>More than ~2 "two-pizza" teams in one repo. Merge conflicts and a CI queue are now a daily tax.</td><td><span class="flag-val">Team autonomy</span></td></tr>
+      <tr><td><span class="flag-name">Wrong-tool pain</span></td><td>You need Python for ML scoring or Go for a high-throughput ingest path, and Node is fighting you.</td><td><span class="flag-val">Tech freedom</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Signals that it is absolutely not time</h3>
+  <div class="warning-box">
+    <div class="warning-box-icon">⚠️</div>
+    <p class="warning-box-text">
+      Stop if any of these are true: <strong>the team is under ~8 engineers</strong>;
+      <strong>the product is still pivoting</strong> and features cross module lines every sprint;
+      <strong>you have no CI/CD</strong>; <strong>you have no centralised logging or metrics</strong>;
+      <strong>nothing is containerised</strong>; or <strong>the real problem is slow queries</strong>
+      and you are hoping architecture will fix a missing index. Splitting under these conditions
+      produces a distributed monolith — twelve deploy pipelines, twelve log files, and still
+      nobody can ship independently.
+    </p>
+  </div>
+
+  <h3>Prerequisites — earn these before you split</h3>
+  <div class="flow-diagram">
+    <div class="flow-step">
+      <div class="flow-connector"><div class="flow-dot flow-dot-blue"></div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <div class="flow-title">Automated deploys</div>
+        <div class="flow-desc">One service you cannot deploy with a button becomes twelve services you cannot deploy with a button.</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-connector"><div class="flow-dot flow-dot-blue"></div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <div class="flow-title">Centralised logs + metrics + tracing</div>
+        <div class="flow-desc">Structured JSON logs shipped somewhere searchable, RED metrics (Rate, Errors, Duration) per endpoint, and correlation IDs. Without these, a distributed bug is unfindable.</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-connector"><div class="flow-dot flow-dot-blue"></div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <div class="flow-title">Containers + an orchestrator</div>
+        <div class="flow-desc">Docker images and Kubernetes (or ECS). You need scheduling, health checks, rolling deploys and service discovery to exist before you have twelve things to schedule.</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-connector"><div class="flow-dot flow-dot-blue"></div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <div class="flow-title">A test suite you trust</div>
+        <div class="flow-desc">You are about to change how modules talk to each other. Without tests you will not know what you broke until a user tells you.</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-connector"><div class="flow-dot flow-dot-green"></div></div>
+      <div class="flow-content">
+        <div class="flow-title">Clear ownership</div>
+        <div class="flow-desc">Every service needs a named owner. A service nobody owns is a service nobody patches.</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>The migration pattern: Strangler Fig</h3>
+  <p>
+    Named after the fig that grows around a host tree until the tree rots away and the fig stands
+    on its own. You never do a big-bang rewrite — every big-bang rewrite you have read about
+    failed. You grow the new system around the old one, one service at a time, with traffic
+    switching gradually.
+  </p>
+
+  <div class="flow-diagram">
+    <div class="flow-step">
+      <div class="flow-connector"><div class="flow-dot flow-dot-accent"></div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <div class="flow-title">Step 1 — Put a proxy in front of the monolith</div>
+        <div class="flow-desc">Nothing else changes. All traffic goes client → gateway → monolith. This gateway is the switch you will use for every future move, so install it before you need it.</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-connector"><div class="flow-dot flow-dot-accent"></div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <div class="flow-title">Step 2 — Modularise inside the monolith first</div>
+        <div class="flow-desc">Move the target capability into its own folder with its own service layer. Delete every cross-module import. If you cannot draw a clean line here, in one codebase with an IDE helping you, you certainly cannot draw it across a network.</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-connector"><div class="flow-dot flow-dot-accent"></div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <div class="flow-title">Step 3 — Pick the first service to extract</div>
+        <div class="flow-desc">Score candidates on: high pain (deploys or scales badly), low coupling (few dependencies on other modules), clear data ownership, and low business risk. Notifications, media processing, search and reporting are usually the best first cuts. Never start with checkout.</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-connector"><div class="flow-dot flow-dot-accent"></div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <div class="flow-title">Step 4 — Carve out its data</div>
+        <div class="flow-desc">The hardest step, and the one people skip. Split the tables/collections it owns into its own database. Break foreign keys deliberately, replace joins with API calls or local read-models, and migrate with dual-writes or change-data-capture before you cut over.</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-connector"><div class="flow-dot flow-dot-accent"></div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <div class="flow-title">Step 5 — Shift traffic gradually at the gateway</div>
+        <div class="flow-desc">Route 1% of <code>/media/*</code> to the new service, then 10%, then 50%, then 100%. Compare error rate and p95 at every stage. The rollback is a routing change, not a redeploy.</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-connector"><div class="flow-dot flow-dot-green"></div></div>
+      <div class="flow-content">
+        <div class="flow-title">Step 6 — Delete the old code, then repeat</div>
+        <div class="flow-desc">If you do not delete it, you now maintain two implementations forever. Deletion is what makes it a migration instead of a duplication. Then choose the next capability and go again.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="quiz-box">
+    <p class="quiz-question">Your traffic doubled and response times are up. What should you try first?</p>
+    <div class="quiz-options" id="quiz-dec-1">
+      <button onclick="answerQuiz('quiz-dec-1', this, true)" class="quiz-option">A &nbsp;—&nbsp; X-axis scaling: add replicas behind a load balancer — it is a config change, not a quarter of work</button>
+      <button onclick="answerQuiz('quiz-dec-1', this, false)" class="quiz-option">B &nbsp;—&nbsp; Y-axis scaling: immediately split the app into eight microservices</button>
+    </div>
+    <div class="quiz-feedback hidden" id="quiz-dec-1-feedback"></div>
+  </div>
+
+  <div class="quiz-box">
+    <p class="quiz-question">In the Strangler Fig pattern, which step do teams most often skip — and regret?</p>
+    <div class="quiz-options" id="quiz-dec-2">
+      <button onclick="answerQuiz('quiz-dec-2', this, false)" class="quiz-option">A &nbsp;—&nbsp; Putting a proxy in front of the monolith</button>
+      <button onclick="answerQuiz('quiz-dec-2', this, true)" class="quiz-option">B &nbsp;—&nbsp; Carving out the data — they extract the code but leave both services on one shared database</button>
+    </div>
+    <div class="quiz-feedback hidden" id="quiz-dec-2-feedback"></div>
+  </div>
+</section>
+
+<!-- ══════════════ 07 · THE SOLUTION ══════════════ -->
+<section class="section-block animate-fade-up" id="solution">
+  <div class="section-header">
+    <div class="section-num-big">07</div>
+    <div class="section-header-text">
+      <div class="section-title">The same traffic, survived</div>
+      <div class="section-subtitle">Load balancer, API gateway, independent services, own databases — built up one layer at a time</div>
+    </div>
+  </div>
+
+  <p>
+    Same viral reel. Same 26,000 requests per second. Different architecture. Step through it and
+    watch which layer absorbs which problem — because each box below exists to solve exactly one
+    of the failures you just watched.
+  </p>
+
+  <div class="diagram-shell" id="dg-sol">
+    <div class="diagram-head">
+      <span class="diagram-name">Architecture build-up · request path</span>
+      <span class="diagram-stepname" id="sol-title">One public door</span>
+    </div>
+
+    <div class="diagram-stage">
+      <svg viewBox="0 0 760 320" role="img" aria-label="Request path from users through CDN, load balancer, API gateway to independent services with their own databases and a message broker">
+        <!-- users -->
+        <text class="svg-label-sm" x="14" y="86">Users</text>
+        <g id="sol-users"></g>
+
+        <!-- wires: users -> cdn -->
+        <path id="w-u-cdn" class="wire" d="M84,150 L98,150"/>
+        <path class="wire-flow" data-wire="w-u-cdn" d="M84,150 L98,150"/>
+
+        <!-- CDN -->
+        <g class="node" id="n-cdn">
+          <rect class="node-shell" x="98" y="126" width="76" height="48" rx="8"/>
+          <text class="svg-label" x="136" y="146" text-anchor="middle">CDN</text>
+          <text class="svg-label-sm" x="136" y="160" text-anchor="middle">CloudFront</text>
+          <text class="svg-label-sm" x="136" y="119" text-anchor="middle">edge · TLS · WAF</text>
+        </g>
+
+        <path id="w-cdn-lb" class="wire" d="M174,150 L196,150"/>
+        <path class="wire-flow" data-wire="w-cdn-lb" d="M174,150 L196,150"/>
+
+        <!-- LOAD BALANCER -->
+        <g class="node" id="n-lb">
+          <rect class="node-shell" x="196" y="126" width="70" height="48" rx="8"/>
+          <text class="svg-label" x="231" y="146" text-anchor="middle">LB</text>
+          <text class="svg-label-sm" x="231" y="160" text-anchor="middle">ALB</text>
+          <text class="svg-label-sm" x="231" y="119" text-anchor="middle">L4/L7 · health</text>
+        </g>
+
+        <!-- LB -> gateway replicas -->
+        <path id="w-lb-g1" class="wire" d="M266,150 C278,150 278,124 288,124"/>
+        <path id="w-lb-g2" class="wire" d="M266,150 L288,150"/>
+        <path id="w-lb-g3" class="wire" d="M266,150 C278,150 278,178 288,178"/>
+        <path class="wire-flow" data-wire="w-lb-g1" d="M266,150 C278,150 278,124 288,124"/>
+        <path class="wire-flow" data-wire="w-lb-g2" d="M266,150 L288,150"/>
+        <path class="wire-flow" data-wire="w-lb-g3" d="M266,150 C278,150 278,178 288,178"/>
+
+        <!-- API GATEWAY replicas -->
+        <g class="node" id="n-gw">
+          <text class="svg-label-sm" x="334" y="100" text-anchor="middle">API Gateway</text>
+          <rect class="node-shell gw-pod" x="288" y="110" width="92" height="28" rx="6"/>
+          <text class="svg-mono" x="334" y="128" text-anchor="middle">gateway-1</text>
+          <rect class="node-shell gw-pod" x="288" y="140" width="92" height="28" rx="6"/>
+          <text class="svg-mono" x="334" y="158" text-anchor="middle">gateway-2</text>
+          <rect class="node-shell gw-pod" x="288" y="170" width="92" height="28" rx="6"/>
+          <text class="svg-mono" x="334" y="188" text-anchor="middle">gateway-3</text>
+          <text class="svg-label-sm" id="sol-gw-job" x="334" y="212" text-anchor="middle">auth · rate-limit · route</text>
+        </g>
+
+        <!-- gateway -> services -->
+        <path id="w-g-auth"    class="wire" d="M380,154 C406,154 406,29 432,29"/>
+        <path id="w-g-orders"  class="wire" d="M380,154 C406,154 406,67 432,67"/>
+        <path id="w-g-catalog" class="wire" d="M380,154 C406,154 406,105 432,105"/>
+        <path id="w-g-media"   class="wire" d="M380,154 C406,154 406,143 432,143"/>
+        <path id="w-g-pay"     class="wire" d="M380,154 C406,154 406,181 432,181"/>
+        <path class="wire-flow" data-wire="w-g-auth"    d="M380,154 C406,154 406,29 432,29"/>
+        <path class="wire-flow" data-wire="w-g-orders"  d="M380,154 C406,154 406,67 432,67"/>
+        <path class="wire-flow" data-wire="w-g-catalog" d="M380,154 C406,154 406,105 432,105"/>
+        <path class="wire-flow" data-wire="w-g-media"   d="M380,154 C406,154 406,143 432,143"/>
+        <path class="wire-flow" data-wire="w-g-pay"     d="M380,154 C406,154 406,181 432,181"/>
+
+        <!-- SERVICES -->
+        <g class="node" id="n-auth">
+          <rect class="node-shell svc" data-svc="auth" x="432" y="15" width="126" height="28" rx="6"/>
+          <text class="svg-mono" x="442" y="33">auth-svc</text>
+          <text class="svg-mono svc-pods" data-svc="auth" x="550" y="33" text-anchor="end">×2</text>
+        </g>
+        <g class="node" id="n-orders">
+          <rect class="node-shell svc" data-svc="orders" x="432" y="53" width="126" height="28" rx="6"/>
+          <text class="svg-mono" x="442" y="71">order-svc</text>
+          <text class="svg-mono svc-pods" data-svc="orders" x="550" y="71" text-anchor="end">×2</text>
+        </g>
+        <g class="node" id="n-catalog">
+          <rect class="node-shell svc" data-svc="catalog" x="432" y="91" width="126" height="28" rx="6"/>
+          <text class="svg-mono" x="442" y="109">catalog-svc</text>
+          <text class="svg-mono svc-pods" data-svc="catalog" x="550" y="109" text-anchor="end">×2</text>
+        </g>
+        <g class="node" id="n-media">
+          <rect class="node-shell svc" data-svc="media" x="432" y="129" width="126" height="28" rx="6"/>
+          <text class="svg-mono" x="442" y="147">media-svc</text>
+          <text class="svg-mono svc-pods" data-svc="media" x="550" y="147" text-anchor="end">×2</text>
+        </g>
+        <g class="node" id="n-pay">
+          <rect class="node-shell svc" data-svc="pay" x="432" y="167" width="126" height="28" rx="6"/>
+          <text class="svg-mono" x="442" y="185">payment-svc</text>
+          <text class="svg-mono svc-pods" data-svc="pay" x="550" y="185" text-anchor="end">×2</text>
+        </g>
+
+        <!-- DATABASES -->
+        <g id="sol-dbs" opacity="0.25">
+          <text class="svg-label-sm" x="640" y="10" text-anchor="middle">own data</text>
+          <g><ellipse cx="640" cy="22" rx="20" ry="4.5" class="node-shell"/><path d="M620,22 L620,36 A20,4.5 0 0,0 660,36 L660,22" class="node-shell"/></g>
+          <g><ellipse cx="640" cy="60" rx="20" ry="4.5" class="node-shell"/><path d="M620,60 L620,74 A20,4.5 0 0,0 660,74 L660,60" class="node-shell"/></g>
+          <g><ellipse cx="640" cy="98" rx="20" ry="4.5" class="node-shell"/><path d="M620,98 L620,112 A20,4.5 0 0,0 660,112 L660,98" class="node-shell"/></g>
+          <g><ellipse cx="640" cy="136" rx="20" ry="4.5" class="node-shell"/><path d="M620,136 L620,150 A20,4.5 0 0,0 660,150 L660,136" class="node-shell"/></g>
+          <g><ellipse cx="640" cy="174" rx="20" ry="4.5" class="node-shell"/><path d="M620,174 L620,188 A20,4.5 0 0,0 660,188 L660,174" class="node-shell"/></g>
+          <line x1="558" y1="29"  x2="620" y2="29"  class="wire"/>
+          <line x1="558" y1="67"  x2="620" y2="67"  class="wire"/>
+          <line x1="558" y1="105" x2="620" y2="105" class="wire"/>
+          <line x1="558" y1="143" x2="620" y2="143" class="wire"/>
+          <line x1="558" y1="181" x2="620" y2="181" class="wire"/>
+        </g>
+
+        <!-- BROKER -->
+        <g class="node dim" id="n-broker">
+          <path id="w-o-mq" class="wire" d="M495,81 L495,238"/>
+          <path class="wire-flow" data-wire="w-o-mq" d="M495,81 L495,238"/>
+          <rect class="node-shell" x="396" y="238" width="200" height="34" rx="8"/>
+          <text class="svg-label" x="496" y="259" text-anchor="middle">RabbitMQ</text>
+          <text class="svg-label-sm" x="496" y="288" text-anchor="middle">email · invoice · analytics consume later</text>
+        </g>
+
+        <text class="svg-label-sm" x="14" y="308">Public entry: 1 · Everything else is private</text>
+      </svg>
+    </div>
+
+    <div class="diagram-caption" id="sol-caption"></div>
+
+    <div class="metric-strip">
+      <div class="metric-cell"><div class="metric-k">Public entry points</div><div class="metric-v" id="s-entry">1</div></div>
+      <div class="metric-cell"><div class="metric-k">Gateway pods</div><div class="metric-v" id="s-gw">3</div></div>
+      <div class="metric-cell"><div class="metric-k">Media pods</div><div class="metric-v" id="s-media">2</div></div>
+      <div class="metric-cell"><div class="metric-k">Blast radius</div><div class="metric-v" id="s-blast">—</div></div>
+      <div class="metric-cell"><div class="metric-k">p95 (checkout)</div><div class="metric-v" id="s-p95">140ms</div></div>
+      <div class="metric-cell"><div class="metric-k">Broken routes</div><div class="metric-v" id="s-broken">0</div></div>
+    </div>
+
+    <div class="diagram-controls">
+      <button class="dg-btn" id="sol-back">← Back</button>
+      <button class="dg-btn" id="sol-fwd">Forward →</button>
+      <span class="dg-counter" id="sol-count">Step 1 / 8</span>
+      <span class="dg-track"><span id="sol-prog"></span></span>
+    </div>
+  </div>
+
+  <div class="quiz-box">
+    <p class="quiz-question">In this architecture, <code>payment-svc</code> crashes completely. What do users experience?</p>
+    <div class="quiz-options" id="quiz-sol-1">
+      <button onclick="answerQuiz('quiz-sol-1', this, false)" class="quiz-option">A &nbsp;—&nbsp; The whole site goes down, same as the monolith</button>
+      <button onclick="answerQuiz('quiz-sol-1', this, true)" class="quiz-option">B &nbsp;—&nbsp; Only payment routes fail — browsing, login and search keep working. Blast radius is one capability</button>
+    </div>
+    <div class="quiz-feedback hidden" id="quiz-sol-1-feedback"></div>
+  </div>
+
+  <div class="quiz-box">
+    <p class="quiz-question">Media upload traffic spikes 12×. What scales?</p>
+    <div class="quiz-options" id="quiz-sol-2">
+      <button onclick="answerQuiz('quiz-sol-2', this, true)" class="quiz-option">A &nbsp;—&nbsp; Only <code>media-svc</code> scales to 6+ pods — auth, orders and catalog stay at 2</button>
+      <button onclick="answerQuiz('quiz-sol-2', this, false)" class="quiz-option">B &nbsp;—&nbsp; Every service scales together, because they share a cluster</button>
+    </div>
+    <div class="quiz-feedback hidden" id="quiz-sol-2-feedback"></div>
+  </div>
+</section>
+
+<!-- ══════════════ 08 · GATEWAY VS LB ══════════════ -->
+<section class="section-block animate-fade-up" id="gateway-lb">
+  <div class="section-header">
+    <div class="section-num-big">08</div>
+    <div class="section-header-text">
+      <div class="section-title">API Gateway vs Load Balancer</div>
+      <div class="section-subtitle">They sit next to each other in every diagram and do completely different jobs</div>
+    </div>
+  </div>
+
+  <p>
+    This is the single most confused pair in backend interviews. The clean way to hold them apart
+    is to notice that they answer <strong>different questions about the same request</strong>.
+  </p>
+
+  <div class="concept-box">
+    <div class="concept-box-label">The two questions</div>
+    <p class="concept-box-text">
+      A <strong>load balancer</strong> asks: <em>"I have N identical copies of the same thing —
+      which healthy one gets this request?"</em><br><br>
+      An <strong>API gateway</strong> asks: <em>"What kind of request is this, is the caller allowed
+      to make it, and which of my many different services should handle it?"</em><br><br>
+      One is about <strong>capacity across copies</strong>. The other is about
+      <strong>policy and destination across capabilities</strong>.
+    </p>
+  </div>
+
+  <h3>The analogy that sticks</h3>
+  <p>
+    A <strong>load balancer is the person at the cinema</strong> pointing you to whichever of the
+    six identical ticket counters is free. Every counter does the same thing; they only care that
+    the queue is even and that they do not send you to a closed one.
+  </p>
+  <p>
+    An <strong>API gateway is the receptionist in an office building</strong>. They check your ID,
+    refuse you if you have already visited fifty times today, log your visit with a badge number,
+    decide whether you need Accounts on floor 3 or Support on floor 7, and translate your request
+    into whatever form that department expects. Different departments, different rules, one front desk.
+  </p>
+
+  <h3>Load balancer — the details you should know</h3>
+  <div class="table-scroll">
+  <table class="flag-table">
+    <thead><tr><th>Concept</th><th>What it means</th><th>Why it matters</th></tr></thead>
+    <tbody>
+      <tr><td><span class="flag-name">Layer 4 (NLB)</span></td><td>Balances TCP/UDP connections. Never reads the HTTP body or path.</td><td>Extremely fast, protocol-agnostic, but it cannot route by URL</td></tr>
+      <tr><td><span class="flag-name">Layer 7 (ALB)</span></td><td>Parses HTTP. Can route on host, path, header, method.</td><td>This is where the LB and the gateway start to overlap</td></tr>
+      <tr><td><span class="flag-name">Round robin</span></td><td>Requests go to each backend in turn.</td><td>Fine when all requests cost roughly the same</td></tr>
+      <tr><td><span class="flag-name">Least connections</span></td><td>Send to the backend with the fewest in-flight requests.</td><td>Better when request cost varies wildly — e.g. uploads</td></tr>
+      <tr><td><span class="flag-name">Health checks</span></td><td>Periodic probe of <span class="flag-val">/healthz</span>; failing backends are pulled out.</td><td>This is what makes a rolling deploy invisible to users</td></tr>
+      <tr><td><span class="flag-name">Sticky sessions</span></td><td>Same client keeps hitting the same backend.</td><td>A crutch for stateful servers — avoid it; keep sessions in Redis/JWT instead</td></tr>
+      <tr><td><span class="flag-name">TLS termination</span></td><td>Decrypts HTTPS at the edge so backends speak plain HTTP.</td><td>Certificates live in one place, not on twelve services</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>API gateway — what it actually does for you</h3>
+  <div class="table-scroll">
+  <table class="flag-table">
+    <thead><tr><th>Responsibility</th><th>Concretely</th><th>What it saves you</th></tr></thead>
+    <tbody>
+      <tr><td><span class="flag-name">Routing</span></td><td><span class="flag-val">/api/orders/*</span> → order-svc, <span class="flag-val">/api/media/*</span> → media-svc</td><td>Clients hold one base URL, not twelve</td></tr>
+      <tr><td><span class="flag-name">Authentication</span></td><td>Verify the JWT once; forward a trusted <span class="flag-val">x-user-id</span> header downstream</td><td>Twelve services stop reimplementing token verification</td></tr>
+      <tr><td><span class="flag-name">Rate limiting</span></td><td>100 req/min per API key; 5 login attempts/min per IP</td><td>One place to stop abuse before it reaches your services</td></tr>
+      <tr><td><span class="flag-name">Aggregation</span></td><td>One <span class="flag-val">/api/home</span> call fans out to 3 services and merges the result</td><td>Mobile clients make 1 round trip instead of 3 — the BFF pattern</td></tr>
+      <tr><td><span class="flag-name">Protocol translation</span></td><td>Public REST/JSON in, internal gRPC out</td><td>Internal efficiency without a public contract change</td></tr>
+      <tr><td><span class="flag-name">Correlation IDs</span></td><td>Generate <span class="flag-val">x-request-id</span> at the door, propagate everywhere</td><td>One user complaint becomes one traceable request across 5 services</td></tr>
+      <tr><td><span class="flag-name">Versioning &amp; canary</span></td><td><span class="flag-val">/v2/*</span> to the new service; 5% of traffic to the canary</td><td>Safe rollouts and gradual migrations — the Strangler Fig switch</td></tr>
+      <tr><td><span class="flag-name">Response caching</span></td><td>Cache <span class="flag-val">GET /catalog</span> for 60s at the edge</td><td>Load your services never see at all</td></tr>
+      <tr><td><span class="flag-name">CORS &amp; headers</span></td><td>One CORS policy, one set of security headers</td><td>Stop copy-pasting <code>cors()</code> into twelve repos</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="table-scroll">
+  <table class="compare-table">
+    <thead><tr><th>Dimension</th><th>Load Balancer</th><th>API Gateway</th></tr></thead>
+    <tbody>
+      <tr><td class="cell-title">Core question</td><td class="cell-muted">Which copy?</td><td class="cell-highlight">Which service, and are you allowed?</td></tr>
+      <tr><td class="cell-title">Backends are</td><td class="cell-muted">Identical instances of one thing</td><td class="cell-highlight">Different services doing different jobs</td></tr>
+      <tr><td class="cell-title">Layer</td><td class="cell-muted">L4 or L7, protocol-focused</td><td class="cell-highlight">L7 only, application-aware</td></tr>
+      <tr><td class="cell-title">Knows about auth</td><td class="cell-muted">No (TLS ≠ auth)</td><td class="cell-highlight">Yes — JWT, OAuth, API keys</td></tr>
+      <tr><td class="cell-title">Rate limiting</td><td class="cell-muted">Crude, connection-level at best</td><td class="cell-highlight">Per user, per key, per route</td></tr>
+      <tr><td class="cell-title">Can merge responses</td><td class="cell-muted">Never</td><td class="cell-highlight">Yes — aggregation / BFF</td></tr>
+      <tr><td class="cell-title">Scale-cube axis</td><td class="cell-muted">X-axis (clone)</td><td class="cell-highlight">Y-axis (functional split)</td></tr>
+      <tr><td class="cell-title">Exists in a monolith?</td><td class="cell-muted">Yes, very commonly</td><td class="cell-highlight">Rarely — there is only one backend to route to</td></tr>
+      <tr><td class="cell-title">Typical products</td><td class="cell-muted">ALB, NLB, HAProxy, kube-proxy</td><td class="cell-highlight">Kong, Envoy Gateway, Traefik, Amazon API Gateway, your own Express app</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="note-box">
+    <div class="note-box-icon">💡</div>
+    <p class="note-box-text">
+      <strong>They are not alternatives — you use both, and usually three times over.</strong>
+      A load balancer sits <em>in front of</em> the gateway (because the gateway itself needs
+      multiple replicas), the gateway routes to services, and then something load-balances across
+      each service's pods. In Kubernetes that last one is free: a <code>Service</code> object
+      already load-balances across the pods behind it.
+    </p>
+  </div>
+
+  <div class="scale-diagram">
+Internet
+   ↓
+<span class="blue">CloudFront</span>          <span class="highlight">CDN</span> — cache static, TLS at edge, absorb DDoS
+   ↓
+<span class="blue">ALB</span>                 <span class="highlight">LOAD BALANCER</span> — pick a healthy gateway pod  <span class="green">(X-axis)</span>
+   ↓
+<span class="blue">API Gateway ×3</span>      <span class="highlight">GATEWAY</span> — authN, rate limit, route, trace  <span class="green">(Y-axis)</span>
+   ↓
+<span class="blue">k8s Service</span>         <span class="highlight">LOAD BALANCER again</span> — pick a healthy pod of that service
+   ↓
+<span class="blue">order-svc pod</span>       <span class="highlight">your code, finally</span>
+  </div>
+
+  <h3>A minimal API gateway you can actually read</h3>
+  <p>
+    Before reaching for Kong or Envoy, write this. Ninety lines of Express, and every gateway
+    responsibility from the table above appears once, in order.
+  </p>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-label">gateway/src/index.js</span>
+      <button onclick="copyCode(this)" class="code-copy-btn">copy</button>
+    </div>
+<pre class="code-pre"><span class="token-yaml-key">import</span> express <span class="token-yaml-key">from</span> <span class="token-string">"express"</span>;
+<span class="token-yaml-key">import</span> { createProxyMiddleware } <span class="token-yaml-key">from</span> <span class="token-string">"http-proxy-middleware"</span>;
+<span class="token-yaml-key">import</span> rateLimit <span class="token-yaml-key">from</span> <span class="token-string">"express-rate-limit"</span>;
+<span class="token-yaml-key">import</span> jwt <span class="token-yaml-key">from</span> <span class="token-string">"jsonwebtoken"</span>;
+<span class="token-yaml-key">import</span> { randomUUID } <span class="token-yaml-key">from</span> <span class="token-string">"crypto"</span>;
+
+<span class="token-yaml-key">const</span> app = <span class="token-command">express</span>();
+
+<span class="token-comment">// ── 1. CORRELATION ID — stamped once, carried everywhere ──────────</span>
+app.<span class="token-command">use</span>((req, res, next) =&gt; {
+  req.id = req.headers[<span class="token-string">"x-request-id"</span>] || <span class="token-command">randomUUID</span>();
+  res.<span class="token-command">setHeader</span>(<span class="token-string">"x-request-id"</span>, req.id);
+  next();
+});
+
+<span class="token-comment">// ── 2. RATE LIMIT — abuse stops here, not in twelve services ──────</span>
+app.<span class="token-command">use</span>(<span class="token-string">"/api/auth/login"</span>, <span class="token-command">rateLimit</span>({ windowMs: <span class="token-val">60_000</span>, max: <span class="token-val">5</span> }));
+app.<span class="token-command">use</span>(<span class="token-string">"/api"</span>,            <span class="token-command">rateLimit</span>({ windowMs: <span class="token-val">60_000</span>, max: <span class="token-val">100</span> }));
+
+<span class="token-comment">// ── 3. AUTH — verified ONCE; services trust the header ────────────</span>
+<span class="token-yaml-key">function</span> <span class="token-command">authenticate</span>(req, res, next) {
+  <span class="token-yaml-key">const</span> token = (req.headers.authorization || <span class="token-string">""</span>).<span class="token-command">split</span>(<span class="token-string">" "</span>)[<span class="token-val">1</span>];
+  <span class="token-yaml-key">if</span> (!token) <span class="token-yaml-key">return</span> res.<span class="token-command">status</span>(<span class="token-val">401</span>).<span class="token-command">json</span>({ error: <span class="token-string">"missing token"</span> });
+  <span class="token-yaml-key">try</span> {
+    <span class="token-yaml-key">const</span> claims = jwt.<span class="token-command">verify</span>(token, process.env.JWT_SECRET);
+    req.headers[<span class="token-string">"x-user-id"</span>]   = claims.sub;
+    req.headers[<span class="token-string">"x-user-role"</span>] = claims.role;
+    <span class="token-yaml-key">delete</span> req.headers.authorization;  <span class="token-comment">// never forward the raw token</span>
+    next();
+  } <span class="token-yaml-key">catch</span> { res.<span class="token-command">status</span>(<span class="token-val">401</span>).<span class="token-command">json</span>({ error: <span class="token-string">"invalid token"</span> }); }
+}
+
+<span class="token-comment">// ── 4. ROUTING TABLE — the heart of the gateway ───────────────────</span>
+<span class="token-yaml-key">const</span> routes = [
+  { path: <span class="token-string">"/api/auth"</span>,    target: process.env.AUTH_URL,    <span class="token-command">public</span>: <span class="token-yaml-key">true</span>  },
+  { path: <span class="token-string">"/api/catalog"</span>, target: process.env.CATALOG_URL, <span class="token-command">public</span>: <span class="token-yaml-key">true</span>  },
+  { path: <span class="token-string">"/api/orders"</span>,  target: process.env.ORDER_URL,   <span class="token-command">public</span>: <span class="token-yaml-key">false</span> },
+  { path: <span class="token-string">"/api/media"</span>,   target: process.env.MEDIA_URL,   <span class="token-command">public</span>: <span class="token-yaml-key">false</span> },
+];
+
+<span class="token-yaml-key">for</span> (<span class="token-yaml-key">const</span> r <span class="token-yaml-key">of</span> routes) {
+  <span class="token-yaml-key">const</span> guards = r.<span class="token-command">public</span> ? [] : [authenticate];
+  app.<span class="token-command">use</span>(r.path, ...guards, <span class="token-command">createProxyMiddleware</span>({
+    target: r.target,
+    changeOrigin: <span class="token-yaml-key">true</span>,
+    proxyTimeout: <span class="token-val">5000</span>,       <span class="token-comment">// 5. never wait forever on a service</span>
+    pathRewrite: { [<span class="token-string">`^${r.path}`</span>]: <span class="token-string">""</span> },
+    <span class="token-command">onProxyReq</span>: (proxyReq, req) =&gt; proxyReq.<span class="token-command">setHeader</span>(<span class="token-string">"x-request-id"</span>, req.id),
+    <span class="token-command">onError</span>: (err, req, res) =&gt; {     <span class="token-comment">// 6. degrade, never hang</span>
+      console.<span class="token-command">error</span>(JSON.<span class="token-command">stringify</span>({ lvl: <span class="token-string">"error"</span>, id: req.id, path: r.path, msg: err.message }));
+      res.<span class="token-command">status</span>(<span class="token-val">503</span>).<span class="token-command">json</span>({ error: <span class="token-string">"service unavailable"</span>, service: r.path, requestId: req.id });
+    },
+  }));
+}
+
+app.<span class="token-command">get</span>(<span class="token-string">"/healthz"</span>, (_, res) =&gt; res.<span class="token-command">send</span>(<span class="token-string">"ok"</span>));  <span class="token-comment">// 7. for the load balancer</span>
+app.<span class="token-command">listen</span>(<span class="token-val">8080</span>);</pre>
+  </div>
+
+  <div class="warning-box">
+    <div class="warning-box-icon">⚠️</div>
+    <p class="warning-box-text">
+      <strong>Two gateway traps.</strong> (1) The gateway is a
+      <em>single point of failure</em> — it must always run multiple replicas behind a load
+      balancer, and it must stay stateless. (2) The gateway is
+      <em>not where business logic goes</em>. The moment you write "if the user's cart total is
+      over ₹5,000 then…" in the gateway, you have started rebuilding the monolith at the front
+      door, and every team now has to coordinate through it again. Smart endpoints, dumb pipes.
+    </p>
+  </div>
+
+  <div class="quiz-box">
+    <p class="quiz-question">Which job belongs to the API gateway, not the load balancer?</p>
+    <div class="quiz-options" id="quiz-gw-1">
+      <button onclick="answerQuiz('quiz-gw-1', this, false)" class="quiz-option">A &nbsp;—&nbsp; Removing an unhealthy backend from rotation after a failed <code>/healthz</code> probe</button>
+      <button onclick="answerQuiz('quiz-gw-1', this, true)" class="quiz-option">B &nbsp;—&nbsp; Verifying the JWT and rejecting a caller who has exceeded 100 requests per minute</button>
+    </div>
+    <div class="quiz-feedback hidden" id="quiz-gw-1-feedback"></div>
+  </div>
+
+  <div class="quiz-box">
+    <p class="quiz-question">Your API gateway runs as a single pod. What is wrong with that?</p>
+    <div class="quiz-options" id="quiz-gw-2">
+      <button onclick="answerQuiz('quiz-gw-2', this, true)" class="quiz-option">A &nbsp;—&nbsp; It is a single point of failure — the gateway must be stateless and replicated behind a load balancer</button>
+      <button onclick="answerQuiz('quiz-gw-2', this, false)" class="quiz-option">B &nbsp;—&nbsp; Nothing — a gateway only forwards requests, so one is always enough</button>
+    </div>
+    <div class="quiz-feedback hidden" id="quiz-gw-2-feedback"></div>
+  </div>
+</section>
+
+<!-- ══════════════ 09 · WHAT WE WILL USE ══════════════ -->
+<section class="section-block animate-fade-up" id="our-stack">
+  <div class="section-header">
+    <div class="section-num-big">09</div>
+    <div class="section-header-text">
+      <div class="section-title">So what do <em>we</em> use as the gateway?</div>
+      <div class="section-subtitle">CloudFront? Amazon API Gateway? Nginx? The options, the costs, and the decision</div>
+    </div>
+  </div>
+
+  <div class="warning-box">
+    <div class="warning-box-icon">⚠️</div>
+    <p class="warning-box-text">
+      <strong>First, kill the most common confusion: CloudFront is not an API gateway.</strong>
+      CloudFront is a <em>CDN</em>. Its job is to cache content at edge locations near the user,
+      terminate TLS early, and absorb traffic before it reaches your region. It has no concept of
+      "verify this JWT against my auth service", no per-API-key rate limits, and no request
+      aggregation. You put CloudFront <em>in front of</em> your gateway. You do not use it
+      <em>instead of</em> one.
+    </p>
+  </div>
+
+  <h3>The realistic options, side by side</h3>
+  <div class="table-scroll">
+  <table class="flag-table">
+    <thead><tr><th>Option</th><th>What it really is</th><th>Cost shape</th><th>Verdict for us</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="flag-name">Amazon CloudFront</span></td>
+        <td>Global CDN. Edge caching, TLS termination, AWS Shield Standard DDoS protection built in, WAF attach point, and VPC origins so it can reach a private ALB without exposing it publicly.</td>
+        <td>Per GB + per request; very cheap for cacheable content</td>
+        <td><span class="flag-val">Yes — but as the CDN layer, in front</span></td>
+      </tr>
+      <tr>
+        <td><span class="flag-name">Amazon API Gateway</span></td>
+        <td>Fully managed API front door. JWT authorizers, throttling, usage plans, request validation. Reaches private EKS services through a VPC Link.</td>
+        <td><a href="https://aws.amazon.com/api-gateway/">HTTP API ≈ $1.00 per million requests (first 300M, us-east-1), REST API ≈ $3.50 per million</a>. Asia-Pacific regions run higher. A VPC Link is billed hourly whether or not traffic flows.</td>
+        <td><span class="flag-val">Great for serverless / Lambda; expensive and awkward in front of EKS</span></td>
+      </tr>
+      <tr>
+        <td><span class="flag-name">ALB via AWS Load&nbsp;Balancer Controller</span></td>
+        <td>A real Layer-7 load balancer that you create from a Kubernetes <span class="flag-val">Ingress</span> or <span class="flag-val">Gateway</span> resource. Path and host routing, TLS from ACM, WAF attachment, OIDC auth.</td>
+        <td>Hourly + LCU; flat and predictable at volume</td>
+        <td><span class="flag-val">Yes — this is our load balancer</span></td>
+      </tr>
+      <tr>
+        <td><span class="flag-name">ingress-nginx</span></td>
+        <td>The controller half the internet used for a decade.</td>
+        <td>Free, but see the warning below</td>
+        <td><span class="flag-val">No — retired, do not start new work on it</span></td>
+      </tr>
+      <tr>
+        <td><span class="flag-name">Envoy Gateway / Traefik / Kong</span></td>
+        <td>In-cluster gateways implementing the Kubernetes <span class="flag-val">Gateway API</span>. Full L7 feature set: auth plugins, rate limits, retries, traffic splitting, canary.</td>
+        <td>Free (self-hosted); you pay in ops time</td>
+        <td><span class="flag-val">Yes, when the hand-written gateway outgrows itself</span></td>
+      </tr>
+      <tr>
+        <td><span class="flag-name">Your own Express gateway</span></td>
+        <td>~90 lines of <span class="flag-val">http-proxy-middleware</span>, running as a normal Deployment in the cluster.</td>
+        <td>Free; costs you the code you write</td>
+        <td><span class="flag-val">Yes — this is what the batch builds</span></td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="warning-box">
+    <div class="warning-box-icon">⚠️</div>
+    <p class="warning-box-text">
+      <strong>Important 2026 update — do not teach or install ingress-nginx.</strong>
+      Kubernetes SIG Network and the Security Response Committee
+      <a href="https://www.kubernetes.io/blog/2026/01/29/ingress-nginx-statement/">announced the retirement of the community ingress-nginx controller</a>,
+      and best-effort maintenance ended in <strong>March 2026</strong> — no further releases, bug
+      fixes or security patches. Existing clusters keep routing traffic, but you would be running
+      an unmaintained internet-facing component. Two clarifications students get wrong: the
+      Kubernetes <em>Ingress API itself</em> is not removed (it is still GA, just feature-frozen),
+      and the <em>NGINX web server</em> is completely unaffected. Only that one controller project
+      is retired. Active development has moved to the <strong>Gateway API</strong>, and the
+      <span class="flag-val">ingress2gateway</span> tool exists to convert existing resources.
+    </p>
+  </div>
+
+  <div class="verdict">
+    <div class="verdict-label">Decision for the Codex batch</div>
+    <h4>CloudFront in front · ALB as the load balancer · our own gateway inside the cluster</h4>
+    <p>
+      <strong>Learning phase — build the gateway yourself.</strong> You cannot understand a gateway
+      you did not write. Ninety lines of Express, and you have personally implemented routing,
+      JWT verification, rate limiting, correlation IDs, timeouts and fallbacks. Every managed
+      product after this is just those same responsibilities with a config file.
+      <br><br>
+      <strong>Production on our EKS cluster (ap-southeast-1) — four layers, each doing one job:</strong>
+    </p>
+  </div>
+
+  <div class="scale-diagram">
+<span class="highlight">1. Route 53</span>        api.cryboy.in  →  CloudFront distribution
+<span class="highlight">2. CloudFront</span>      <span class="blue">CDN</span>  static assets, TLS at edge, AWS Shield, WAF attached
+       ↓          <span class="green">absorbs cacheable traffic your cluster never sees</span>
+<span class="highlight">3. ALB</span>             <span class="blue">LOAD BALANCER</span>  created by AWS Load Balancer Controller
+       ↓          <span class="green">health checks + spreads across gateway pods (X-axis)</span>
+<span class="highlight">4. api-gateway ×3</span>  <span class="blue">API GATEWAY</span>  our Express service, stateless, HPA-scaled
+       ↓          <span class="green">authN, rate limit, route by path, correlation id (Y-axis)</span>
+<span class="highlight">5. k8s Services</span>    <span class="blue">LOAD BALANCER (free)</span>  ClusterIP spreads across each service's pods
+       ↓
+<span class="highlight">6. auth · order · catalog · media · payment</span>   <span class="green">each with its own database</span>
+  </div>
+
+  <h3>Why not just put Amazon API Gateway in front of EKS?</h3>
+  <p>
+    You can, and for a Lambda-based product you absolutely should. For a containerised product on
+    EKS, three things push against it. <strong>Cost shape:</strong> you pay per request forever,
+    and at a few hundred million requests a month that is real money for routing you were already
+    doing in-cluster. <strong>Plumbing:</strong> reaching private services inside the VPC needs a
+    VPC Link, which is billed hourly even at zero traffic, plus an NLB or ALB behind it anyway.
+    <strong>Control:</strong> your routing rules live in AWS config instead of in the repo next to
+    the services, so a routing change is a Terraform apply rather than a deploy.
+  </p>
+
+  <div class="note-box">
+    <div class="note-box-icon">💡</div>
+    <p class="note-box-text">
+      <strong>The rule of thumb:</strong> if your compute is <em>serverless</em>, use the managed
+      Amazon API Gateway — it is designed for exactly that. If your compute is a
+      <em>Kubernetes cluster</em>, keep the gateway inside the cluster, where it deploys, scales and
+      versions with everything else.
+    </p>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-label">k8s/gateway-ingress.yaml — ALB in front of our gateway</span>
+      <button onclick="copyCode(this)" class="code-copy-btn">copy</button>
+    </div>
+<pre class="code-pre"><span class="token-yaml-key">apiVersion:</span> networking.k8s.io/v1
+<span class="token-yaml-key">kind:</span> Ingress
+<span class="token-yaml-key">metadata:</span>
+  <span class="token-yaml-key">name:</span> api-gateway
+  <span class="token-yaml-key">annotations:</span>
+    <span class="token-comment"># provisions a real ALB via the AWS Load Balancer Controller</span>
+    alb.ingress.kubernetes.io/scheme: <span class="token-val">internet-facing</span>
+    alb.ingress.kubernetes.io/target-type: <span class="token-val">ip</span>
+    alb.ingress.kubernetes.io/healthcheck-path: <span class="token-string">/healthz</span>
+    alb.ingress.kubernetes.io/listen-ports: <span class="token-string">'[{"HTTPS":443}]'</span>
+    alb.ingress.kubernetes.io/certificate-arn: <span class="token-val">arn:aws:acm:ap-southeast-1:...</span>
+<span class="token-yaml-key">spec:</span>
+  <span class="token-yaml-key">ingressClassName:</span> alb
+  <span class="token-yaml-key">rules:</span>
+    - <span class="token-yaml-key">host:</span> api.cryboy.in
+      <span class="token-yaml-key">http:</span>
+        <span class="token-yaml-key">paths:</span>
+          <span class="token-comment"># ALB sends EVERYTHING to the gateway. The gateway does the real routing.</span>
+          - <span class="token-yaml-key">path:</span> /
+            <span class="token-yaml-key">pathType:</span> Prefix
+            <span class="token-yaml-key">backend:</span>
+              <span class="token-yaml-key">service:</span>
+                <span class="token-yaml-key">name:</span> api-gateway
+                <span class="token-yaml-key">port:</span> { number: <span class="token-val">8080</span> }</pre>
+  </div>
+
+  <div class="quiz-box">
+    <p class="quiz-question">Can CloudFront replace your API gateway?</p>
+    <div class="quiz-options" id="quiz-stack-1">
+      <button onclick="answerQuiz('quiz-stack-1', this, false)" class="quiz-option">A &nbsp;—&nbsp; Yes — CloudFront routes by path, so it is a gateway with a CDN attached</button>
+      <button onclick="answerQuiz('quiz-stack-1', this, true)" class="quiz-option">B &nbsp;—&nbsp; No — CloudFront is a CDN. It caches and terminates TLS at the edge, but it does not do JWT auth, per-key rate limits or aggregation. It goes in front of the gateway</button>
+    </div>
+    <div class="quiz-feedback hidden" id="quiz-stack-1-feedback"></div>
+  </div>
+
+  <div class="quiz-box">
+    <p class="quiz-question">A student wants to install ingress-nginx on a fresh EKS cluster in 2026. What do you tell them?</p>
+    <div class="quiz-options" id="quiz-stack-2">
+      <button onclick="answerQuiz('quiz-stack-2', this, true)" class="quiz-option">A &nbsp;—&nbsp; Don't — the project was retired in March 2026 with no further security patches. Use the AWS Load Balancer Controller or a Gateway API implementation</button>
+      <button onclick="answerQuiz('quiz-stack-2', this, false)" class="quiz-option">B &nbsp;—&nbsp; Go ahead — it is the standard Kubernetes ingress controller</button>
+    </div>
+    <div class="quiz-feedback hidden" id="quiz-stack-2-feedback"></div>
+  </div>
+</section>
+
+<!-- ══════════════ 10 · MESSAGE BROKER ══════════════ -->
+<section class="section-block animate-fade-up" id="broker">
+  <div class="section-header">
+    <div class="section-num-big">10</div>
+    <div class="section-header-text">
+      <div class="section-title">The message broker</div>
+      <div class="section-subtitle">You split the monolith. Now the services are wired to each other — and that is its own problem.</div>
+    </div>
+  </div>
+
+  <p>
+    Splitting into services solved deployment, scaling and blast radius. It did not solve
+    <strong>coupling between services</strong>. In fact the naïve version makes it worse, because
+    now the coupling runs over a network that can fail.
+  </p>
+
+  <h3>The problem: the synchronous chain</h3>
+  <p>
+    Here is the code every team writes first. A customer places an order, so the order service
+    does the obvious thing — it calls everyone who needs to know.
+  </p>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-label">order-service/src/createOrder.js — the version that will hurt you</span>
+      <button onclick="copyCode(this)" class="code-copy-btn">copy</button>
+    </div>
+<pre class="code-pre"><span class="token-yaml-key">async function</span> <span class="token-command">createOrder</span>(req, res) {
+  <span class="token-yaml-key">const</span> order = <span class="token-yaml-key">await</span> Order.<span class="token-command">create</span>(req.body);            <span class="token-comment">//   30ms</span>
+
+  <span class="token-yaml-key">await</span> axios.<span class="token-command">post</span>(<span class="token-string">"http://payment-svc/charge"</span>,  order); <span class="token-comment">//  400ms</span>
+  <span class="token-yaml-key">await</span> axios.<span class="token-command">post</span>(<span class="token-string">"http://email-svc/confirm"</span>,   order); <span class="token-comment">//  600ms  ← 3rd-party SMTP</span>
+  <span class="token-yaml-key">await</span> axios.<span class="token-command">post</span>(<span class="token-string">"http://invoice-svc/generate"</span>, order); <span class="token-comment">//  250ms  ← PDF render</span>
+  <span class="token-yaml-key">await</span> axios.<span class="token-command">post</span>(<span class="token-string">"http://analytics/track"</span>,     order); <span class="token-comment">//   80ms</span>
+  <span class="token-yaml-key">await</span> axios.<span class="token-command">post</span>(<span class="token-string">"http://warehouse/reserve"</span>,   order); <span class="token-comment">//  180ms</span>
+
+  res.<span class="token-command">json</span>(order);   <span class="token-comment">// customer has been staring at a spinner for 1,540ms</span>
+}</pre>
+  </div>
+
+  <p>Count what is wrong with this — there are five separate failures, and only one of them is speed.</p>
+
+  <div class="flow-diagram">
+    <div class="flow-step">
+      <div class="flow-connector"><div class="flow-dot flow-dot-accent"></div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <div class="flow-title">1 · Latency adds up</div>
+        <div class="flow-desc">The customer waits for the sum of every downstream call. Generating a PDF invoice has nothing to do with whether the order was accepted, yet it is on the critical path.</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-connector"><div class="flow-dot flow-dot-accent"></div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <div class="flow-title">2 · Temporal coupling — all six must be alive at the same instant</div>
+        <div class="flow-desc">Availability multiplies. Six services at 99.9% each gives you 99.4% for the chain — roughly 3.6 hours of downtime a month created purely by wiring things together synchronously.</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-connector"><div class="flow-dot flow-dot-accent"></div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <div class="flow-title">3 · Failure coupling — the mail server takes down checkout</div>
+        <div class="flow-desc">SMTP is slow this morning, so <code>await email-svc</code> hangs, so the order fails, so you lose the sale. A non-critical service just became critical because of an <code>await</code>.</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-connector"><div class="flow-dot flow-dot-accent"></div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <div class="flow-title">4 · Change coupling — every new listener edits this file</div>
+        <div class="flow-desc">Fraud team wants order events? Edit and redeploy order-service. Loyalty points? Edit and redeploy order-service. Your "independent" service is now edited by five teams — exactly the monolith problem, wearing a new hat.</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-connector"><div class="flow-dot flow-dot-green"></div></div>
+      <div class="flow-content">
+        <div class="flow-title">5 · Spike coupling — the slowest consumer sets the pace</div>
+        <div class="flow-desc">10,000 orders/minute during a sale means 10,000 PDF renders per minute, whether invoice-svc can do 500 or not. There is no buffer, so the pressure lands directly on the weakest link.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="concept-box">
+    <div class="concept-box-label">Key Concept</div>
+    <p class="concept-box-text">
+      A <strong>message broker</strong> is a piece of infrastructure that sits between services and
+      holds messages. The producer hands a message to the broker and is <em>done</em>. The broker
+      stores it durably and delivers it to whoever is interested, whenever they are ready.<br><br>
+      The producer stops asking <em>"who needs to know about this and are they up right now?"</em>
+      and starts simply announcing <em>"an order was created."</em>
+    </p>
+  </div>
+
+  <h3>Exactly how a broker decouples: three dimensions</h3>
+  <p>
+    "Loose coupling" is a phrase people repeat without unpacking. Here is the unpacked version —
+    a broker removes three different dependencies, and it is worth being able to name all three.
+  </p>
+
+  <div class="table-scroll">
+  <table class="compare-table">
+    <thead><tr><th>Dimension</th><th>Direct HTTP call</th><th>Through a broker</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="cell-title">Space<br><span style="font-weight:400;color:var(--muted)">(who / where)</span></td>
+        <td class="cell-muted">Producer needs the URL, port and API shape of every consumer. Adding a consumer means editing the producer.</td>
+        <td class="cell-highlight">Producer knows only an exchange name and a routing key. It has no idea who is listening, or whether anyone is.</td>
+      </tr>
+      <tr>
+        <td class="cell-title">Time<br><span style="font-weight:400;color:var(--muted)">(when)</span></td>
+        <td class="cell-muted">Both must be alive at the same instant. Consumer down = request lost.</td>
+        <td class="cell-highlight">Consumer can be down for an hour. Messages wait in a durable queue and are processed when it returns.</td>
+      </tr>
+      <tr>
+        <td class="cell-title">Synchronisation<br><span style="font-weight:400;color:var(--muted)">(who waits)</span></td>
+        <td class="cell-muted">Producer blocks until the consumer answers. Consumer's latency is the producer's latency.</td>
+        <td class="cell-highlight">Producer publishes in ~2ms and returns. Consumers take as long as they need. Neither one waits for the other.</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>The rewrite</h3>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-label">order-service/src/createOrder.js — the version that survives Black Friday</span>
+      <button onclick="copyCode(this)" class="code-copy-btn">copy</button>
+    </div>
+<pre class="code-pre"><span class="token-yaml-key">async function</span> <span class="token-command">createOrder</span>(req, res) {
+  <span class="token-yaml-key">const</span> order = <span class="token-yaml-key">await</span> Order.<span class="token-command">create</span>(req.body);              <span class="token-comment">// 30ms</span>
+
+  <span class="token-comment">// Payment stays synchronous — the customer genuinely needs the answer NOW.</span>
+  <span class="token-yaml-key">const</span> payment = <span class="token-yaml-key">await</span> paymentClient.<span class="token-command">charge</span>(order);     <span class="token-comment">// 400ms</span>
+
+  <span class="token-comment">// Everything else: announce it once and move on.</span>
+  <span class="token-comment">// order-service does not know email, invoice, analytics or warehouse exist.</span>
+  channel.<span class="token-command">publish</span>(<span class="token-string">"orders"</span>, <span class="token-string">"order.created"</span>,
+    Buffer.<span class="token-command">from</span>(JSON.<span class="token-command">stringify</span>({ ...order, paymentId: payment.id })),
+    { persistent: <span class="token-yaml-key">true</span>, messageId: order.id, contentType: <span class="token-string">"application/json"</span> }
+  );                                                     <span class="token-comment">//  2ms</span>
+
+  res.<span class="token-command">json</span>(order);   <span class="token-comment">// 432ms total, and nothing downstream can break checkout</span>
+}</pre>
+  </div>
+
+  <div class="note-box">
+    <div class="note-box-icon">💡</div>
+    <p class="note-box-text">
+      <strong>The judgement call is what stays synchronous.</strong> Ask: <em>does the user need
+      this answer to continue?</em> Payment authorisation — yes, keep it sync. Confirmation email,
+      invoice PDF, analytics, warehouse reservation, search reindex, loyalty points — no. If the
+      user would never notice it happening 400ms later, it belongs on the queue.
+    </p>
+  </div>
+
+  <h3>RabbitMQ's model — five nouns you must know</h3>
+  <p>
+    RabbitMQ speaks AMQP 0-9-1, and its one genuinely important idea is this:
+    <strong>a producer never publishes to a queue.</strong> It publishes to an
+    <em>exchange</em>, and the exchange decides which queues get a copy. That indirection
+    <em>is</em> the decoupling.
+  </p>
+
+  <div class="scale-diagram">
+<span class="highlight">Producer</span> ──publish(<span class="blue">exchange</span>, <span class="red">routingKey</span>, msg)──▶ <span class="blue">EXCHANGE</span>
+                                                 │
+                     bindings match routingKey ──┤
+                                                 ▼
+                                            <span class="green">QUEUE</span> (durable, stores messages)
+                                                 │
+                                                 ▼
+                                            <span class="highlight">Consumer</span> ──ack──▶ message deleted
+  </div>
+
+  <div class="table-scroll">
+  <table class="flag-table">
+    <thead><tr><th>Noun</th><th>What it is</th><th>Rule of thumb</th></tr></thead>
+    <tbody>
+      <tr><td><span class="flag-name">Connection</span></td><td>One TCP connection to the broker.</td><td>Expensive — open one per process and keep it</td></tr>
+      <tr><td><span class="flag-name">Channel</span></td><td>A lightweight virtual connection multiplexed over the TCP connection.</td><td>Cheap — one per thread/worker. Never share a channel across concurrent consumers</td></tr>
+      <tr><td><span class="flag-name">Exchange</span></td><td>The router. Receives every published message and decides where copies go.</td><td>Producers only ever know this name</td></tr>
+      <tr><td><span class="flag-name">Binding</span></td><td>A rule connecting an exchange to a queue, usually with a pattern.</td><td>Declared by the <em>consumer</em>, which is why adding a consumer needs no producer change</td></tr>
+      <tr><td><span class="flag-name">Queue</span></td><td>An ordered buffer that actually stores messages until acked.</td><td>One queue per consuming service per event type</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h4>Exchange types</h4>
+  <div class="table-scroll">
+  <table class="flag-table">
+    <thead><tr><th>Type</th><th>Routing rule</th><th>Use it for</th></tr></thead>
+    <tbody>
+      <tr><td><span class="flag-name">direct</span></td><td>Routing key must match the binding key exactly.</td><td>Task queues — <span class="flag-val">image.resize</span> to the resize workers</td></tr>
+      <tr><td><span class="flag-name">fanout</span></td><td>Ignores the key. Every bound queue gets a copy.</td><td>Broadcast — cache invalidation to all nodes</td></tr>
+      <tr><td><span class="flag-name">topic</span></td><td>Wildcard patterns: <span class="flag-val">*</span> = one word, <span class="flag-val">#</span> = zero or more. <span class="flag-val">order.*</span>, <span class="flag-val">order.#</span>, <span class="flag-val">*.created</span></td><td><strong>Domain events — your default choice</strong></td></tr>
+      <tr><td><span class="flag-name">headers</span></td><td>Matches on message header values instead of the key.</td><td>Rare. Reach for topic first</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Watch the decoupling happen</h3>
+  <p>
+    Same seven-step treatment. Watch particularly at steps 4–5 (a consumer dies and nothing is
+    lost) and step 7 (a new team subscribes without anyone touching the order service).
+  </p>
+
+  <div class="diagram-shell" id="dg-mq">
+    <div class="diagram-head">
+      <span class="diagram-name">RabbitMQ · topic exchange</span>
+      <span class="diagram-stepname" id="mq-title">Publish once, return immediately</span>
+    </div>
+
+    <div class="diagram-stage">
+      <svg viewBox="0 0 760 320" role="img" aria-label="Order service publishing to a RabbitMQ topic exchange which routes to multiple queues and consumers">
+        <!-- client -->
+        <text class="svg-label-sm" x="16" y="128">POST /orders</text>
+        <path id="w-c-o" class="wire" d="M16,138 L16,152 L60,152"/>
+
+        <!-- producer -->
+        <g class="node" id="mq-prod">
+          <rect class="node-shell" x="16" y="130" width="112" height="44" rx="8"/>
+          <text class="svg-label" x="72" y="150" text-anchor="middle">order-svc</text>
+          <text class="svg-label-sm" x="72" y="164" text-anchor="middle">producer</text>
+          <text class="svg-mono" id="mq-resp" x="72" y="192" text-anchor="middle" fill="var(--accent2)">responds in 42ms</text>
+        </g>
+
+        <path id="w-p-x" class="wire" d="M128,152 L186,152"/>
+        <path class="wire-flow" data-wire="w-p-x" d="M128,152 L186,152"/>
+        <text class="svg-mono" x="157" y="144" text-anchor="middle">order.created</text>
+
+        <!-- exchange -->
+        <g class="node" id="mq-x">
+          <rect class="node-shell" x="186" y="126" width="118" height="52" rx="8"/>
+          <text class="svg-label" x="245" y="146" text-anchor="middle">exchange</text>
+          <text class="svg-label-sm" x="245" y="160" text-anchor="middle">orders · topic</text>
+          <text class="svg-label-sm" x="245" y="172" text-anchor="middle">routes by key</text>
+        </g>
+
+        <!-- bindings -->
+        <path id="w-x-q1" class="wire" d="M304,152 C340,152 340,39 380,39"/>
+        <path id="w-x-q2" class="wire" d="M304,152 C340,152 340,117 380,117"/>
+        <path id="w-x-q3" class="wire" d="M304,152 C340,152 340,195 380,195"/>
+        <path id="w-x-q4" class="wire" d="M304,152 C340,152 340,273 380,273"/>
+        <path class="wire-flow" data-wire="w-x-q1" d="M304,152 C340,152 340,39 380,39"/>
+        <path class="wire-flow" data-wire="w-x-q2" d="M304,152 C340,152 340,117 380,117"/>
+        <path class="wire-flow" data-wire="w-x-q3" d="M304,152 C340,152 340,195 380,195"/>
+        <path class="wire-flow" data-wire="w-x-q4" d="M304,152 C340,152 340,273 380,273"/>
+
+        <!-- queues -->
+        <g class="node" id="mq-q1">
+          <rect class="node-shell" data-q="q1" x="380" y="22" width="170" height="34" rx="6"/>
+          <text class="svg-mono" x="388" y="38">q.email</text>
+          <text class="svg-mono" data-depth="q1" x="542" y="38" text-anchor="end">0</text>
+          <rect class="q-bar-bg" x="388" y="44" width="154" height="6" rx="3"/>
+          <rect class="q-bar" data-bar="q1" x="388" y="44" width="0" height="6" rx="3"/>
+        </g>
+        <g class="node" id="mq-q2">
+          <rect class="node-shell" data-q="q2" x="380" y="100" width="170" height="34" rx="6"/>
+          <text class="svg-mono" x="388" y="116">q.invoice</text>
+          <text class="svg-mono" data-depth="q2" x="542" y="116" text-anchor="end">0</text>
+          <rect class="q-bar-bg" x="388" y="122" width="154" height="6" rx="3"/>
+          <rect class="q-bar" data-bar="q2" x="388" y="122" width="0" height="6" rx="3"/>
+        </g>
+        <g class="node" id="mq-q3">
+          <rect class="node-shell" data-q="q3" x="380" y="178" width="170" height="34" rx="6"/>
+          <text class="svg-mono" x="388" y="194">q.analytics</text>
+          <text class="svg-mono" data-depth="q3" x="542" y="194" text-anchor="end">0</text>
+          <rect class="q-bar-bg" x="388" y="200" width="154" height="6" rx="3"/>
+          <rect class="q-bar" data-bar="q3" x="388" y="200" width="0" height="6" rx="3"/>
+        </g>
+        <g class="node dim" id="mq-q4">
+          <rect class="node-shell" data-q="q4" x="380" y="256" width="170" height="34" rx="6"/>
+          <text class="svg-mono" x="388" y="272">q.warehouse</text>
+          <text class="svg-mono" data-depth="q4" x="542" y="272" text-anchor="end">0</text>
+          <rect class="q-bar-bg" x="388" y="278" width="154" height="6" rx="3"/>
+          <rect class="q-bar" data-bar="q4" x="388" y="278" width="0" height="6" rx="3"/>
+        </g>
+
+        <!-- queue -> consumer wires -->
+        <path id="w-q1-c1" class="wire" d="M550,39 L608,39"/>
+        <path id="w-q2-c2" class="wire" d="M550,117 L608,117"/>
+        <path id="w-q3-c3" class="wire" d="M550,195 L608,195"/>
+        <path id="w-q4-c4" class="wire" d="M550,273 L608,273"/>
+        <path class="wire-flow" data-wire="w-q1-c1" d="M550,39 L608,39"/>
+        <path class="wire-flow" data-wire="w-q2-c2" d="M550,117 L608,117"/>
+        <path class="wire-flow" data-wire="w-q3-c3" d="M550,195 L608,195"/>
+        <path class="wire-flow" data-wire="w-q4-c4" d="M550,273 L608,273"/>
+
+        <!-- consumers -->
+        <g class="node" id="mq-c1"><rect class="node-shell" data-c="c1" x="608" y="22" width="136" height="34" rx="6"/><text class="svg-mono" x="676" y="43" text-anchor="middle">email-svc</text></g>
+        <g class="node" id="mq-c2"><rect class="node-shell" data-c="c2" x="608" y="100" width="136" height="34" rx="6"/><text class="svg-mono" x="676" y="121" text-anchor="middle">invoice-svc</text></g>
+        <g class="node" id="mq-c3"><rect class="node-shell" data-c="c3" x="608" y="178" width="136" height="34" rx="6"/><text class="svg-mono" x="676" y="199" text-anchor="middle">analytics-svc</text></g>
+        <g class="node dim" id="mq-c4"><rect class="node-shell" data-c="c4" x="608" y="256" width="136" height="34" rx="6"/><text class="svg-mono" x="676" y="277" text-anchor="middle">warehouse-svc</text></g>
+
+        <!-- binding key labels -->
+        <text class="svg-mono" x="352" y="76"  text-anchor="middle" id="bk1">order.*</text>
+        <text class="svg-mono" x="352" y="140" text-anchor="middle" id="bk2">order.created</text>
+        <text class="svg-mono" x="352" y="228" text-anchor="middle" id="bk3">order.#</text>
+        <text class="svg-mono" x="352" y="306" text-anchor="middle" id="bk4" opacity="0">order.created</text>
+      </svg>
+    </div>
+
+    <div class="diagram-caption" id="mq-caption"></div>
+
+    <div class="metric-strip">
+      <div class="metric-cell"><div class="metric-k">API response</div><div class="metric-v" id="q-resp">42ms</div></div>
+      <div class="metric-cell"><div class="metric-k">Consumers order-svc knows</div><div class="metric-v" id="q-knows">0</div></div>
+      <div class="metric-cell"><div class="metric-k">Email queue depth</div><div class="metric-v" id="q-depth">0</div></div>
+      <div class="metric-cell"><div class="metric-k">Messages lost</div><div class="metric-v" id="q-lost">0</div></div>
+      <div class="metric-cell"><div class="metric-k">Failed orders</div><div class="metric-v" id="q-fail">0</div></div>
+      <div class="metric-cell"><div class="metric-k">Producer changes</div><div class="metric-v" id="q-changes">0</div></div>
+    </div>
+
+    <div class="diagram-controls">
+      <button class="dg-btn" id="mq-back">← Back</button>
+      <button class="dg-btn" id="mq-fwd">Forward →</button>
+      <span class="dg-counter" id="mq-count">Step 1 / 7</span>
+      <span class="dg-track"><span id="mq-prog"></span></span>
+    </div>
+  </div>
+
+  <div class="concept-box">
+    <div class="concept-box-label">The precise answer to "how does a broker decouple services?"</div>
+    <p class="concept-box-text">
+      Because <strong>bindings are declared by the consumer, not the producer.</strong>
+      <code>order-svc</code> publishes to the exchange <code>orders</code> with the key
+      <code>order.created</code> and that is the total extent of its knowledge. Every consuming
+      service declares its own queue and binds it to that exchange with whatever pattern it cares
+      about. Adding, removing or breaking a consumer changes nothing on the producer side — no
+      code change, no redeploy, no coordination meeting. The exchange name and routing key are the
+      only contract, and both sides depend on that contract instead of on each other.
+    </p>
+  </div>
+
+  <div class="quiz-box">
+    <p class="quiz-question">The email service is down for 30 minutes. Orders are still being placed. What happens to the confirmation emails?</p>
+    <div class="quiz-options" id="quiz-brk2-1">
+      <button onclick="answerQuiz('quiz-brk2-1', this, false)" class="quiz-option">A &nbsp;—&nbsp; They are lost — the broker cannot deliver to a dead consumer</button>
+      <button onclick="answerQuiz('quiz-brk2-1', this, true)" class="quiz-option">B &nbsp;—&nbsp; They pile up in the durable queue and are all delivered when the service comes back — time decoupling</button>
+    </div>
+    <div class="quiz-feedback hidden" id="quiz-brk2-1-feedback"></div>
+  </div>
+
+  <div class="quiz-box">
+    <p class="quiz-question">Why does adding a new consumer require zero changes to the producer?</p>
+    <div class="quiz-options" id="quiz-brk2-2">
+      <button onclick="answerQuiz('quiz-brk2-2', this, true)" class="quiz-option">A &nbsp;—&nbsp; The consumer declares its own queue and binding; the producer only ever knows an exchange name and a routing key</button>
+      <button onclick="answerQuiz('quiz-brk2-2', this, false)" class="quiz-option">B &nbsp;—&nbsp; RabbitMQ scans the producer's code and auto-registers new subscribers</button>
+    </div>
+    <div class="quiz-feedback hidden" id="quiz-brk2-2-feedback"></div>
+  </div>
+</section>
+
+<!-- ══════════════ 11 · RABBITMQ IN PRACTICE ══════════════ -->
+<section class="section-block animate-fade-up" id="rabbitmq">
+  <div class="section-header">
+    <div class="section-num-big">11</div>
+    <div class="section-header-text">
+      <div class="section-title">RabbitMQ in practice</div>
+      <div class="section-subtitle">Reliability settings, the code, and the four mistakes everybody makes</div>
+    </div>
+  </div>
+
+  <div class="badge badge-accent">Step 1 — Publish reliably</div>
+  <p>
+    A default <code>publish()</code> is fire-and-forget: if the broker is restarting, your message
+    silently vanishes. Three settings turn that into a guarantee.
+  </p>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-label">order-service/src/broker/publisher.js</span>
+      <button onclick="copyCode(this)" class="code-copy-btn">copy</button>
+    </div>
+<pre class="code-pre"><span class="token-yaml-key">import</span> amqp <span class="token-yaml-key">from</span> <span class="token-string">"amqplib"</span>;
+
+<span class="token-yaml-key">let</span> channel;
+
+<span class="token-yaml-key">export async function</span> <span class="token-command">initPublisher</span>() {
+  <span class="token-yaml-key">const</span> conn = <span class="token-yaml-key">await</span> amqp.<span class="token-command">connect</span>(process.env.AMQP_URL);
+  conn.<span class="token-command">on</span>(<span class="token-string">"close"</span>, () =&gt; <span class="token-command">setTimeout</span>(initPublisher, <span class="token-val">2000</span>));  <span class="token-comment">// always reconnect</span>
+
+  <span class="token-comment">// ConfirmChannel → the broker ACKs us back. Without this you never</span>
+  <span class="token-comment">// find out that a publish failed.</span>
+  channel = <span class="token-yaml-key">await</span> conn.<span class="token-command">createConfirmChannel</span>();
+
+  <span class="token-comment">// durable: the exchange definition survives a broker restart</span>
+  <span class="token-yaml-key">await</span> channel.<span class="token-command">assertExchange</span>(<span class="token-string">"orders"</span>, <span class="token-string">"topic"</span>, { durable: <span class="token-yaml-key">true</span> });
+}
+
+<span class="token-yaml-key">export function</span> <span class="token-command">publish</span>(routingKey, payload, messageId) {
+  <span class="token-yaml-key">return new</span> <span class="token-command">Promise</span>((resolve, reject) =&gt; {
+    channel.<span class="token-command">publish</span>(
+      <span class="token-string">"orders"</span>,
+      routingKey,                                <span class="token-comment">// e.g. "order.created"</span>
+      Buffer.<span class="token-command">from</span>(JSON.<span class="token-command">stringify</span>(payload)),
+      {
+        persistent:  <span class="token-yaml-key">true</span>,                     <span class="token-comment">// write the MESSAGE to disk too</span>
+        messageId,                             <span class="token-comment">// consumers dedupe on this</span>
+        contentType: <span class="token-string">"application/json"</span>,
+        timestamp:   Date.<span class="token-command">now</span>(),
+        headers:     { <span class="token-string">"x-request-id"</span>: payload.corrId, <span class="token-string">"x-schema"</span>: <span class="token-string">"v1"</span> },
+      },
+      (err) =&gt; (err ? <span class="token-command">reject</span>(err) : <span class="token-command">resolve</span>()) <span class="token-comment">// ← publisher confirm</span>
+    );
+  });
+}</pre>
+  </div>
+
+  <div class="note-box">
+    <div class="note-box-icon">💡</div>
+    <p class="note-box-text">
+      <strong>durable vs persistent — the classic exam trap.</strong>
+      <code>durable: true</code> on a queue or exchange means <em>the definition</em> survives a
+      broker restart. <code>persistent: true</code> on a message means <em>the message content</em>
+      is written to disk. You need <strong>both</strong>. A persistent message in a non-durable
+      queue dies with the queue; a durable queue full of transient messages comes back empty.
+    </p>
+  </div>
+
+  <div class="badge badge-green">Step 2 — Consume safely</div>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-label">email-service/src/broker/consumer.js</span>
+      <button onclick="copyCode(this)" class="code-copy-btn">copy</button>
+    </div>
+<pre class="code-pre"><span class="token-yaml-key">import</span> amqp <span class="token-yaml-key">from</span> <span class="token-string">"amqplib"</span>;
+
+<span class="token-yaml-key">export async function</span> <span class="token-command">startConsumer</span>() {
+  <span class="token-yaml-key">const</span> conn = <span class="token-yaml-key">await</span> amqp.<span class="token-command">connect</span>(process.env.AMQP_URL);
+  <span class="token-yaml-key">const</span> ch   = <span class="token-yaml-key">await</span> conn.<span class="token-command">createChannel</span>();
+
+  <span class="token-comment">// ── Dead-letter setup: where poison messages go to be inspected ──</span>
+  <span class="token-yaml-key">await</span> ch.<span class="token-command">assertExchange</span>(<span class="token-string">"orders.dlx"</span>, <span class="token-string">"topic"</span>, { durable: <span class="token-yaml-key">true</span> });
+  <span class="token-yaml-key">await</span> ch.<span class="token-command">assertQueue</span>(<span class="token-string">"q.email.dead"</span>, { durable: <span class="token-yaml-key">true</span> });
+  <span class="token-yaml-key">await</span> ch.<span class="token-command">bindQueue</span>(<span class="token-string">"q.email.dead"</span>, <span class="token-string">"orders.dlx"</span>, <span class="token-string">"#"</span>);
+
+  <span class="token-comment">// ── The work queue. THE CONSUMER declares the binding — this is</span>
+  <span class="token-comment">//    the line that makes the producer independent of us.</span>
+  <span class="token-yaml-key">await</span> ch.<span class="token-command">assertQueue</span>(<span class="token-string">"q.email"</span>, {
+    durable: <span class="token-yaml-key">true</span>,
+    arguments: {
+      <span class="token-string">"x-queue-type"</span>:              <span class="token-string">"quorum"</span>,      <span class="token-comment">// replicated + HA (RabbitMQ 4.x)</span>
+      <span class="token-string">"x-dead-letter-exchange"</span>:    <span class="token-string">"orders.dlx"</span>,
+      <span class="token-string">"x-delivery-limit"</span>:          <span class="token-val">5</span>,             <span class="token-comment">// then dead-letter it</span>
+    },
+  });
+  <span class="token-yaml-key">await</span> ch.<span class="token-command">bindQueue</span>(<span class="token-string">"q.email"</span>, <span class="token-string">"orders"</span>, <span class="token-string">"order.*"</span>);
+
+  <span class="token-comment">// ── PREFETCH: the single most important consumer setting.</span>
+  <span class="token-comment">//    Without it RabbitMQ pushes the ENTIRE queue at one consumer</span>
+  <span class="token-comment">//    and it runs out of memory while its siblings sit idle.</span>
+  <span class="token-yaml-key">await</span> ch.<span class="token-command">prefetch</span>(<span class="token-val">10</span>);
+
+  ch.<span class="token-command">consume</span>(<span class="token-string">"q.email"</span>, <span class="token-yaml-key">async</span> (msg) =&gt; {
+    <span class="token-yaml-key">if</span> (!msg) <span class="token-yaml-key">return</span>;
+    <span class="token-yaml-key">const</span> event = JSON.<span class="token-command">parse</span>(msg.content.<span class="token-command">toString</span>());
+
+    <span class="token-yaml-key">try</span> {
+      <span class="token-comment">// IDEMPOTENCY: delivery is AT-LEAST-ONCE, so this WILL run twice</span>
+      <span class="token-comment">// one day. Make the second run a no-op.</span>
+      <span class="token-yaml-key">const</span> fresh = <span class="token-yaml-key">await</span> SentLog.<span class="token-command">create</span>({ _id: msg.properties.messageId })
+        .<span class="token-command">catch</span>(e =&gt; (e.code === <span class="token-val">11000</span> ? <span class="token-yaml-key">null</span> : Promise.<span class="token-command">reject</span>(e)));
+      <span class="token-yaml-key">if</span> (fresh) <span class="token-yaml-key">await</span> <span class="token-command">sendConfirmationEmail</span>(event);
+
+      ch.<span class="token-command">ack</span>(msg);                     <span class="token-comment">// only now is it deleted from the queue</span>
+    } <span class="token-yaml-key">catch</span> (err) {
+      <span class="token-yaml-key">const</span> transient = err.code === <span class="token-string">"ETIMEDOUT"</span> || err.status &gt;= <span class="token-val">500</span>;
+      <span class="token-comment">// requeue=true  → try again later (SMTP blip)</span>
+      <span class="token-comment">// requeue=false → straight to the DLX (malformed message)</span>
+      ch.<span class="token-command">nack</span>(msg, <span class="token-yaml-key">false</span>, transient);
+    }
+  }, { noAck: <span class="token-yaml-key">false</span> });      <span class="token-comment">// noAck:true = "lose my messages", never use it</span>
+}</pre>
+  </div>
+
+  <h3>The reliability switches, and what each one protects against</h3>
+  <div class="table-scroll">
+  <table class="flag-table">
+    <thead><tr><th>Setting</th><th>What it does</th><th>What you lose without it</th></tr></thead>
+    <tbody>
+      <tr><td><span class="flag-name">createConfirmChannel</span></td><td>Broker acknowledges each publish back to you.</td><td>Silent message loss when the broker is busy or restarting</td></tr>
+      <tr><td><span class="flag-name">durable: true</span></td><td>Queue/exchange definitions survive a broker restart.</td><td>Your topology disappears on restart</td></tr>
+      <tr><td><span class="flag-name">persistent: true</span></td><td>Message bodies are written to disk.</td><td>Every unprocessed message dies with the broker</td></tr>
+      <tr><td><span class="flag-name">noAck: false</span> + <span class="flag-name">ack()</span></td><td>Message is deleted only after you say you handled it.</td><td>A consumer crash mid-processing loses that message forever</td></tr>
+      <tr><td><span class="flag-name">prefetch(n)</span></td><td>Caps unacked messages per consumer; work spreads across workers.</td><td>One consumer swallows the whole queue and OOMs while others idle</td></tr>
+      <tr><td><span class="flag-name">x-queue-type: quorum</span></td><td>Raft-replicated queue across broker nodes. In RabbitMQ 4.x this is <em>the</em> HA option — <a href="https://www.rabbitmq.com/docs/quorum-queues">classic queue mirroring was removed in 4.0</a>.</td><td>A broker node failure takes your queue with it</td></tr>
+      <tr><td><span class="flag-name">x-dead-letter-exchange</span></td><td>Failed/expired messages are routed somewhere inspectable.</td><td>A poison message loops forever, burning CPU</td></tr>
+      <tr><td><span class="flag-name">x-delivery-limit</span></td><td>After N redeliveries, dead-letter it.</td><td>Infinite retry loops on a permanently broken message</td></tr>
+      <tr><td><span class="flag-name">x-message-ttl</span></td><td>Messages expire after a set time.</td><td>Unbounded queue growth; a broker that fills its disk</td></tr>
+      <tr><td><span class="flag-name">messageId</span> + dedupe</td><td>Consumer-side idempotency key.</td><td>Duplicate emails, double charges — delivery is at-least-once</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="warning-box">
+    <div class="warning-box-icon">⚠️</div>
+    <p class="warning-box-text">
+      <strong>Four mistakes, in the order students make them.</strong>
+      (1) <strong>Assuming exactly-once delivery.</strong> RabbitMQ gives at-least-once. If the
+      network drops between your <code>ack</code> and the broker receiving it, you get the message
+      again. Idempotent consumers are not optional.
+      (2) <strong>Forgetting prefetch.</strong> Default is unlimited — one worker takes everything.
+      (3) <strong>Acking before the work is done.</strong> That is at-most-once with extra steps.
+      (4) <strong>Using the queue as a database.</strong> A queue is a pipe, not storage. If you
+      need to query it, you needed a database.
+    </p>
+  </div>
+
+  <h3>Ordering, and the honest caveat</h3>
+  <p>
+    A single queue with a single consumer preserves order. The moment you scale to three
+    consumers for throughput, ordering across them is gone — message 3 can finish before message 1.
+    If order matters within an entity (all events for <em>this</em> order), the usual fix is a
+    <strong>consistent-hash exchange</strong> so all messages with the same key land on the same
+    queue, or you design events so order does not matter (include a version number and ignore
+    stale events). Do not pretend the problem is not there.
+  </p>
+
+  <h3>RabbitMQ or Kafka?</h3>
+  <div class="table-scroll">
+  <table class="compare-table">
+    <thead><tr><th>Dimension</th><th>RabbitMQ</th><th>Kafka</th></tr></thead>
+    <tbody>
+      <tr><td class="cell-title">Mental model</td><td class="cell-highlight">A smart post office — routes each message to interested queues ✓</td><td class="cell-muted">An append-only log that consumers read at their own offset</td></tr>
+      <tr><td class="cell-title">After consumption</td><td class="cell-highlight">Message is acked and deleted</td><td class="cell-muted">Message stays for the retention period; replayable</td></tr>
+      <tr><td class="cell-title">Routing</td><td class="cell-highlight">Rich — topic/direct/fanout/headers, per-message ✓</td><td class="cell-muted">Simple — topics and partitions</td></tr>
+      <tr><td class="cell-title">Throughput</td><td class="cell-muted">Tens of thousands msg/s — plenty for most products</td><td class="cell-highlight">Millions msg/s ✓</td></tr>
+      <tr><td class="cell-title">Per-message control</td><td class="cell-highlight">Priorities, TTL, DLX, individual nack ✓</td><td class="cell-muted">Coarse — offsets, not individual messages</td></tr>
+      <tr><td class="cell-title">Replay history</td><td class="cell-muted">No (use RabbitMQ Streams if you need it)</td><td class="cell-highlight">Yes, natively ✓</td></tr>
+      <tr><td class="cell-title">Operational weight</td><td class="cell-highlight">Runs happily in one small pod ✓</td><td class="cell-muted">Heavier; brokers, partitions, consumer-group tuning</td></tr>
+      <tr><td class="cell-title">Reach for it when</td><td class="cell-highlight">Task queues, service-to-service events, complex routing ✓</td><td class="cell-muted">Event sourcing, stream processing, analytics firehose</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="verdict">
+    <div class="verdict-label">Decision for the Codex batch</div>
+    <h4>RabbitMQ — because our problem is routing, not volume</h4>
+    <p>
+      We are decoupling services and running background jobs, not ingesting a billion clickstream
+      events. RabbitMQ's topic exchange, per-message TTL, dead-letter exchanges and simple ops fit
+      that exactly, and it runs in one modest pod on our cluster with a management UI at port
+      15672 that makes queue depth visible to students during a live demo. Kafka solves a real
+      problem — it is simply not this one.
+    </p>
+  </div>
+
+  <div class="badge badge-blue">Info</div>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-label">Terminal — local dev in 30 seconds</span>
+      <button onclick="copyCode(this)" class="code-copy-btn">copy</button>
+    </div>
+<pre class="code-pre"><span class="token-comment"># management UI on :15672 (guest/guest), AMQP on :5672</span>
+<span class="token-command">docker</span> <span class="token-flag">run</span> <span class="token-flag">-d</span> <span class="token-flag">--name</span> <span class="token-val">rabbit</span> <span class="token-flag">-p</span> <span class="token-val">5672:5672</span> <span class="token-flag">-p</span> <span class="token-val">15672:15672</span> <span class="token-operator">\</span>
+  <span class="token-val">rabbitmq:4-management</span>
+
+<span class="token-comment"># watch a queue fill up while you kill a consumer — best demo there is</span>
+<span class="token-command">docker</span> <span class="token-flag">exec</span> <span class="token-val">rabbit</span> <span class="token-command">rabbitmqctl</span> <span class="token-flag">list_queues</span> <span class="token-val">name messages consumers</span>
+
+<span class="token-comment"># in the app</span>
+<span class="token-command">npm</span> <span class="token-flag">i</span> <span class="token-val">amqplib</span></pre>
+  </div>
+
+  <div class="quiz-box">
+    <p class="quiz-question">You set <code>durable: true</code> on your queue but forget <code>persistent: true</code> on messages. The broker restarts. What happens?</p>
+    <div class="quiz-options" id="quiz-rmq-1">
+      <button onclick="answerQuiz('quiz-rmq-1', this, true)" class="quiz-option">A &nbsp;—&nbsp; The queue comes back, but empty — the definition survived, the messages did not</button>
+      <button onclick="answerQuiz('quiz-rmq-1', this, false)" class="quiz-option">B &nbsp;—&nbsp; Everything is fine — a durable queue implies durable messages</button>
+    </div>
+    <div class="quiz-feedback hidden" id="quiz-rmq-1-feedback"></div>
+  </div>
+
+  <div class="quiz-box">
+    <p class="quiz-question">Why must a RabbitMQ consumer be idempotent?</p>
+    <div class="quiz-options" id="quiz-rmq-2">
+      <button onclick="answerQuiz('quiz-rmq-2', this, false)" class="quiz-option">A &nbsp;—&nbsp; It does not need to be — RabbitMQ guarantees exactly-once delivery</button>
+      <button onclick="answerQuiz('quiz-rmq-2', this, true)" class="quiz-option">B &nbsp;—&nbsp; Delivery is at-least-once — a lost ack means the same message is redelivered and processed twice</button>
+    </div>
+    <div class="quiz-feedback hidden" id="quiz-rmq-2-feedback"></div>
+  </div>
+</section>
+
+<!-- ══════════════ 12 · RECAP ══════════════ -->
+<section class="section-block animate-fade-up" id="recap">
+  <div class="section-header">
+    <div class="section-num-big">12</div>
+    <div class="section-header-text">
+      <div class="section-title">Recap &amp; checklist</div>
+      <div class="section-subtitle">If you remember nine things from these notes, make it these</div>
+    </div>
+  </div>
+
+  <div class="flow-diagram">
+    <div class="flow-step"><div class="flow-connector"><div class="flow-dot flow-dot-accent"></div><div class="flow-line"></div></div>
+      <div class="flow-content"><div class="flow-title">1 · The unit of deployment is the unit of failure and the unit of scale</div>
+      <div class="flow-desc">Microservices exist to make that unit smaller. Everything else is machinery to survive having done so.</div></div></div>
+    <div class="flow-step"><div class="flow-connector"><div class="flow-dot flow-dot-accent"></div><div class="flow-line"></div></div>
+      <div class="flow-content"><div class="flow-title">2 · Distributed ≠ microservices</div>
+      <div class="flow-desc">Distributed is a deployment fact (many machines). Microservices is a design choice (split by business capability). Three copies of one monolith is the former, not the latter.</div></div></div>
+    <div class="flow-step"><div class="flow-connector"><div class="flow-dot flow-dot-accent"></div><div class="flow-line"></div></div>
+      <div class="flow-content"><div class="flow-title">3 · Shared database = distributed monolith</div>
+      <div class="flow-desc">If two services write the same table, they cannot deploy independently, and you have paid the whole bill for none of the benefit.</div></div></div>
+    <div class="flow-step"><div class="flow-connector"><div class="flow-dot flow-dot-accent"></div><div class="flow-line"></div></div>
+      <div class="flow-content"><div class="flow-title">4 · Modular monolith first, always</div>
+      <div class="flow-desc">Then Strangler Fig. Never a big-bang rewrite. Extract the highest-pain, lowest-coupling capability first — and actually delete the old code.</div></div></div>
+    <div class="flow-step"><div class="flow-connector"><div class="flow-dot flow-dot-accent"></div><div class="flow-line"></div></div>
+      <div class="flow-content"><div class="flow-title">5 · Try the X-axis before the Y-axis</div>
+      <div class="flow-desc">Adding replicas behind a load balancer is an afternoon. Splitting into services is a quarter. Only split when cloning stops helping.</div></div></div>
+    <div class="flow-step"><div class="flow-connector"><div class="flow-dot flow-dot-accent"></div><div class="flow-line"></div></div>
+      <div class="flow-content"><div class="flow-title">6 · Load balancer picks a copy; gateway picks a service and enforces policy</div>
+      <div class="flow-desc">You use both. LB in front of the gateway, gateway in front of the services, and Kubernetes Services load-balancing the pods behind each one.</div></div></div>
+    <div class="flow-step"><div class="flow-connector"><div class="flow-dot flow-dot-accent"></div><div class="flow-line"></div></div>
+      <div class="flow-content"><div class="flow-title">7 · CloudFront is a CDN, not a gateway</div>
+      <div class="flow-desc">Our stack: Route 53 → CloudFront → ALB → our Express gateway ×3 → services. And no new ingress-nginx in 2026 — it is retired.</div></div></div>
+    <div class="flow-step"><div class="flow-connector"><div class="flow-dot flow-dot-accent"></div><div class="flow-line"></div></div>
+      <div class="flow-content"><div class="flow-title">8 · A broker decouples in space, time and synchronisation</div>
+      <div class="flow-desc">Producers know only an exchange and a routing key. Consumers declare their own bindings. That one inversion is what makes services independent.</div></div></div>
+    <div class="flow-step"><div class="flow-connector"><div class="flow-dot flow-dot-green"></div></div>
+      <div class="flow-content"><div class="flow-title">9 · Everything on the queue must be idempotent</div>
+      <div class="flow-desc">At-least-once delivery is a promise that you will one day process the same message twice. Design for it on day one, not after the duplicate-invoice incident.</div></div></div>
+  </div>
+
+  <h3>Before you call it a microservice — the checklist</h3>
+  <div class="pill-row">
+    <span class="pill">☐ Owns its own database</span>
+    <span class="pill">☐ Deployable alone, on a Friday</span>
+    <span class="pill">☐ Has a named owner</span>
+    <span class="pill">☐ /healthz + /readyz</span>
+    <span class="pill">☐ Structured JSON logs</span>
+    <span class="pill">☐ Propagates x-request-id</span>
+    <span class="pill">☐ Timeout on every outbound call</span>
+    <span class="pill">☐ Retry with backoff + jitter</span>
+    <span class="pill">☐ Circuit breaker on dependencies</span>
+    <span class="pill">☐ Idempotent write endpoints</span>
+    <span class="pill">☐ Containerised + CI pipeline</span>
+    <span class="pill">☐ Versioned, backward-compatible API</span>
+    <span class="pill">☐ Resource requests &amp; limits set</span>
+    <span class="pill">☐ Dashboard: rate, errors, duration</span>
+  </div>
+
+  <div class="note-box">
+    <div class="note-box-icon">💡</div>
+    <p class="note-box-text">
+      <strong>Homework.</strong> Take the monolith you already built. Do not split it yet. First
+      draw its capabilities as boxes, mark every place two boxes share a database table, and mark
+      every place one box <code>await</code>s another. Those two sets of marks are your future
+      service boundaries and your future queue, respectively — and finding them on paper costs a
+      lot less than finding them in production.
+    </p>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <span>Sheryians Coding School · Codex Batch — Microservices Notes</span>
+  <span>Gateway: Express ×3 · Broker: RabbitMQ 4.x · Cluster: EKS ap-southeast-1</span>
+</footer>
+
+</main>
+</div>
+
+<script>
+/* ═══════════════ shared helpers ═══════════════ */
+const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('.code-pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    const old = btn.textContent;
+    btn.textContent = 'copied';
+    setTimeout(() => { btn.textContent = old; }, 1300);
+  }).catch(() => { btn.textContent = 'failed'; });
+}
+
+function answerQuiz(quizId, btn, isCorrect) {
+  const container = document.getElementById(quizId);
+  const feedback  = document.getElementById(quizId + '-feedback');
+  container.querySelectorAll('.quiz-option').forEach(b => {
+    b.disabled = true;
+    b.style.opacity = '0.6';
+  });
+  if (isCorrect) {
+    btn.classList.add('correct');
+    feedback.textContent = '✓ Correct!';
+    feedback.className = 'quiz-feedback correct';
+  } else {
+    btn.classList.add('incorrect');
+    feedback.textContent = '✗ Not quite — try reviewing that section.';
+    feedback.className = 'quiz-feedback incorrect';
+  }
+}
+
+const SVGNS = 'http://www.w3.org/2000/svg';
+function tone(v) { return v === 'down' ? 'var(--accent)' : v === 'slow' ? 'var(--gold)' : 'var(--accent2)'; }
+function setMetric(id, value, cls) {
+  const el = document.getElementById(id);
+  el.textContent = value;
+  el.className = 'metric-v' + (cls ? ' ' + cls : '');
+}
+
+/* ═══════════════ DIAGRAM 1 · MONOLITH UNDER LOAD ═══════════════ */
+(function () {
+  const usersG = document.getElementById('mono-users');
+  for (let r = 0; r < 9; r++) {
+    for (let c = 0; c < 6; c++) {
+      const dot = document.createElementNS(SVGNS, 'circle');
+      dot.setAttribute('cx', 26 + c * 19);
+      dot.setAttribute('cy', 42 + r * 20);
+      dot.setAttribute('r', 3.6);
+      dot.setAttribute('class', 'user-dot');
+      usersG.appendChild(dot);
+    }
+  }
+  const dots = [...usersG.children];
+
+  const S = [
+    { t: 'Tuesday, 4:00 PM — a normal day',
+      c: 'One Node process. One MongoDB. One deploy. About 400 requests a second, mostly cheap reads. Everything green — and this is a genuinely good place to be. Do not leave it without a reason.',
+      users: '120', rps: '400', p95: '60ms', cpu: '24%', pool: '6 / 20', err: '0.0%',
+      rate: 9, errR: 0, intensity: 0.18, load: 0.10, state: '', shake: false, ghosts: false,
+      mods: { auth: 'ok', orders: 'ok', catalog: 'ok', media: 'ok', reports: 'ok' }, ec: 'ok' },
+
+    { t: '4:12 PM — the reel goes viral',
+      c: 'Traffic is 12× normal and climbing. Node is still coping. Notice where it is going: roughly 90% of it is hitting one single route, <b>POST /media/upload</b>. Every other feature is idle.',
+      users: '1,500', rps: '4,800', p95: '180ms', cpu: '61%', pool: '14 / 20', err: '0.1%',
+      rate: 24, errR: 0, intensity: 0.45, load: 0.34, state: '', shake: false, ghosts: false,
+      mods: { auth: 'ok', orders: 'ok', catalog: 'ok', media: 'ok', reports: 'ok' }, ec: 'ok' },
+
+    { t: '4:19 PM — the event loop starts to lag',
+      c: 'Image resizing is CPU-bound and synchronous. While it runs, the event loop cannot serve <b>anybody</b> — including /auth, which does nothing but one indexed Mongo lookup. p95 has gone up 23× on routes that are doing no extra work at all.',
+      users: '6,000', rps: '19,000', p95: '1,400ms', cpu: '96%', pool: '20 / 20', err: '2.1%',
+      rate: 42, errR: 0.06, intensity: 0.75, load: 0.62, state: 'hot', shake: true, ghosts: false,
+      mods: { auth: 'slow', orders: 'slow', catalog: 'slow', media: 'slow', reports: 'slow' }, ec: 'warn' },
+
+    { t: '4:22 PM — the connection pool is exhausted',
+      c: 'All 20 database connections are held by upload requests waiting on I/O. Everything else queues in memory behind them. RSS climbs, the garbage collector starts thrashing, and latency stops being a number anyone cares about.',
+      users: '9,000', rps: '26,000', p95: '9,200ms', cpu: '99%', pool: '20 / 20 ⛔', err: '34%',
+      rate: 56, errR: 0.32, intensity: 0.92, load: 0.85, state: 'hot', shake: true, ghosts: false,
+      mods: { auth: 'slow', orders: 'slow', catalog: 'slow', media: 'down', reports: 'down' }, ec: 'bad' },
+
+    { t: '4:23 PM — retries amplify the fire',
+      c: 'Clients time out and retry. The mobile app retries 3×, the load balancer retries, the browser retries. Effective traffic <b>triples while capacity is falling</b>. This is a retry storm, and it is exactly how a slowdown becomes an outage.',
+      users: '9,000', rps: '71,000', p95: 'timeout', cpu: '100%', pool: '0 / 20 ✗', err: '78%',
+      rate: 72, errR: 0.62, intensity: 1, load: 0.97, state: 'hot', shake: true, ghosts: false,
+      mods: { auth: 'down', orders: 'slow', catalog: 'down', media: 'down', reports: 'down' }, ec: 'bad' },
+
+    { t: '4:24 PM — the process dies',
+      c: 'OOM kill. Every feature goes down together — login, checkout, catalog, invoices — <b>none of which had anything to do with image uploads</b>. One deploy unit, one process, one fate. That is coupled failure, and it is the entire reason these notes exist.',
+      users: '0 served', rps: '0', p95: '—', cpu: '—', pool: '—', err: '100%',
+      rate: 64, errR: 1, intensity: 1, load: 1, state: 'dead', shake: false, ghosts: false,
+      mods: { auth: 'down', orders: 'down', catalog: 'down', media: 'down', reports: 'down' }, ec: 'bad' },
+
+    { t: 'The "fix" that is not a fix',
+      c: 'So you scale the monolith to 5 replicas. Now you pay 5× for auth, orders, catalog and reports just to get 5× image processing — and all five replicas still share <b>one database</b>, which is the new bottleneck. You moved the wall. You did not remove it. Section 07 removes it.',
+      users: '9,000', rps: '26,000', p95: '3,100ms', cpu: '5 × 74%', pool: '20 / 20 ⛔', err: '18%',
+      rate: 48, errR: 0.18, intensity: 0.92, load: 0.72, state: 'hot', shake: false, ghosts: true,
+      mods: { auth: 'slow', orders: 'slow', catalog: 'slow', media: 'slow', reports: 'down' }, ec: 'warn' },
+  ];
+
+  let step = 0, timer = null, visible = true;
+  const g = document.getElementById('mono-arrows');
+
+  function spawn() {
+    if (!visible || REDUCED) return;
+    const s = S[step];
+    if (g.childElementCount > 80) return;
+    const n = Math.max(1, Math.round(s.rate * 0.085));
+    for (let i = 0; i < n; i++) {
+      const el = document.createElementNS(SVGNS, 'polygon');
+      const bad = Math.random() < s.errR;
+      el.setAttribute('points', '0,-1.6 11,-1.6 11,-4.2 17,0 11,4.2 11,1.6');
+      el.setAttribute('class', 'arrow ' + (bad ? 'err arrow-bounce' : 'arrow-fly'));
+      const dur = (bad ? 0.85 : 0.72) - Math.min(0.36, s.rate / 210) + Math.random() * 0.22;
+      el.style.setProperty('--ay', (44 + Math.random() * 200).toFixed(1) + 'px');
+      el.style.setProperty('--x0', '158px');
+      el.style.setProperty('--x1', '494px');
+      el.style.setProperty('--xh', '424px');
+      el.style.setProperty('--dur', dur.toFixed(2) + 's');
+      el.addEventListener('animationend', () => el.remove());
+      g.appendChild(el);
+    }
+  }
+
+  function render() {
+    const s = S[step];
+    document.getElementById('mono-title').textContent = s.t;
+    document.getElementById('mono-caption').innerHTML = s.c;
+
+    dots.forEach((d, i) => {
+      const on = i / dots.length < s.intensity;
+      d.setAttribute('class', 'user-dot' + (on ? (s.intensity > 0.7 ? ' hot' : ' on') : ''));
+    });
+
+    const box = document.getElementById('mono-box');
+    box.setAttribute('class', 'node-shell' + (s.state ? ' ' + s.state : ' ok'));
+    const server = document.getElementById('mono-server');
+    server.setAttribute('class', s.shake && !REDUCED ? 'shaking' : '');
+
+    Object.entries(s.mods).forEach(([mod, v]) => {
+      const el = document.querySelector('.mod-state[data-mod="' + mod + '"]');
+      el.textContent = v === 'down' ? 'down' : v === 'slow' ? 'slow' : 'ok';
+      el.setAttribute('fill', tone(v));
+      const chip = document.querySelector('.mod-chip[data-mod="' + mod + '"]');
+      chip.setAttribute('stroke', v === 'ok' ? 'var(--rule)' : tone(v));
+    });
+
+    const bar = document.getElementById('mono-load');
+    bar.setAttribute('width', Math.max(10, s.load * 122));
+    bar.setAttribute('fill', s.load > 0.8 ? 'var(--accent)' : s.load > 0.5 ? 'var(--gold)' : 'var(--accent2)');
+    document.getElementById('mono-ghosts').setAttribute('opacity', s.ghosts ? '1' : '0');
+    document.getElementById('mono-lane').textContent =
+      s.errR > 0.4 ? 'HTTP requests — most now rejected' : s.errR > 0 ? 'HTTP requests — some timing out' : 'HTTP requests';
+
+    setMetric('m-users', s.users);
+    setMetric('m-rps', s.rps, s.ec === 'bad' ? 'bad' : s.ec === 'warn' ? 'warn' : '');
+    setMetric('m-p95', s.p95, s.ec === 'bad' ? 'bad' : s.ec === 'warn' ? 'warn' : 'ok');
+    setMetric('m-cpu', s.cpu, s.ec === 'bad' ? 'bad' : s.ec === 'warn' ? 'warn' : '');
+    setMetric('m-pool', s.pool, s.ec === 'bad' ? 'bad' : s.ec === 'warn' ? 'warn' : '');
+    setMetric('m-err', s.err, s.ec === 'bad' ? 'bad' : s.ec === 'warn' ? 'warn' : 'ok');
+
+    document.getElementById('mono-count').textContent = 'Step ' + (step + 1) + ' / ' + S.length;
+    document.getElementById('mono-prog').style.width = ((step + 1) / S.length * 100) + '%';
+    document.getElementById('mono-back').disabled = step === 0;
+    document.getElementById('mono-fwd').disabled = step === S.length - 1;
+  }
+
+  document.getElementById('mono-back').onclick = () => { if (step > 0) { step--; render(); } };
+  document.getElementById('mono-fwd').onclick  = () => { if (step < S.length - 1) { step++; render(); } };
+
+  if (!REDUCED) {
+    timer = setInterval(spawn, 80);
+    new IntersectionObserver(e => { visible = e[0].isIntersecting; }, { threshold: 0.05 })
+      .observe(document.getElementById('dg-mono'));
+  }
+  render();
+})();
+
+/* ═══════════════ DIAGRAM 2 · THE ARCHITECTURE ═══════════════ */
+(function () {
+  const ALL = ['n-cdn','n-lb','n-gw','n-auth','n-orders','n-catalog','n-media','n-pay','n-broker'];
+  const SVCS = ['auth','orders','catalog','media','pay'];
+
+  const S = [
+    { t: 'One public door',
+      c: 'Every request from every client enters at exactly one place. DNS points at CloudFront; CloudFront\'s origin is the ALB. Cacheable GETs and static assets are answered at the edge and <b>never reach your cluster at all</b> — that is load your services do not have to survive.',
+      dim: ['n-gw','n-auth','n-orders','n-catalog','n-media','n-pay','n-broker'],
+      live: [['w-u-cdn'],['w-cdn-lb']], dbs: 0.2,
+      gwJob: 'auth · rate-limit · route',
+      m: { entry: '1', gw: '3', media: '2', blast: '—', p95: '140ms', broken: '0' } },
+
+    { t: 'Load balancer — which copy?',
+      c: 'The ALB asks one question: which of the three <b>identical</b> gateway pods should get this request? It probes <code>/healthz</code>, pulls failing pods out of rotation, and spreads the load. That is X-axis scaling, and it is the entire job. It knows nothing about your business.',
+      dim: ['n-auth','n-orders','n-catalog','n-media','n-pay','n-broker'],
+      live: [['w-cdn-lb'],['w-lb-g1'],['w-lb-g2'],['w-lb-g3']], dbs: 0.2,
+      gwJob: 'auth · rate-limit · route',
+      m: { entry: '1', gw: '3', media: '2', blast: '—', p95: '140ms', broken: '0' } },
+
+    { t: 'API gateway — the work the LB will not do',
+      c: 'Now the request is inside the cluster. The gateway verifies the JWT <b>once</b>, checks this user\'s rate limit, stamps an <code>x-request-id</code>, strips the raw token and forwards a trusted <code>x-user-id</code> header. Five services stop reimplementing authentication five times.',
+      dim: ['n-auth','n-orders','n-catalog','n-media','n-pay','n-broker'],
+      live: [['w-lb-g2']], dbs: 0.2,
+      gwJob: 'JWT ✓ · 100/min ✓ · x-request-id',
+      m: { entry: '1', gw: '3', media: '2', blast: '—', p95: '140ms', broken: '0' } },
+
+    { t: 'Route by path',
+      c: '<code>/api/auth</code> → auth-svc · <code>/api/orders</code> → order-svc · <code>/api/media</code> → media-svc. The client only ever knows one base URL. It has no idea there are five services behind it — which means you can split one of them into two tomorrow without shipping a new mobile app.',
+      dim: ['n-broker'],
+      live: [['w-g-auth'],['w-g-orders'],['w-g-catalog'],['w-g-media'],['w-g-pay']], dbs: 0.2,
+      svc: { auth: 'on', orders: 'on', catalog: 'on', media: 'on', pay: 'on' },
+      gwJob: 'route by path prefix',
+      m: { entry: '1', gw: '3', media: '2', blast: '—', p95: '140ms', broken: '0' } },
+
+    { t: 'One service, one database',
+      c: 'No shared tables. No cross-service joins. order-svc <b>cannot</b> read the payments collection — it has to ask. This is the rule teams break first and regret longest, because a shared schema silently removes the independent deployment you did all this work to get.',
+      dim: ['n-broker'],
+      live: [['w-g-orders'],['w-g-media']], dbs: 1,
+      svc: { auth: 'on', orders: 'on', catalog: 'on', media: 'on', pay: 'on' },
+      gwJob: 'route by path prefix',
+      m: { entry: '1', gw: '3', media: '2', blast: '—', p95: '140ms', broken: '0' } },
+
+    { t: 'The same viral reel — scale only what is hot',
+      c: 'Traffic spikes 12× on uploads. The HorizontalPodAutoscaler takes media-svc from 2 pods to 12 because <b>its</b> CPU is high. auth, orders, catalog and payments stay at 2, because nothing about them changed. Checkout latency does not move. Compare that to five copies of the entire product.',
+      dim: ['n-broker'],
+      live: [['w-g-media','hot'],['w-g-orders'],['w-g-auth']], dbs: 1,
+      svc: { auth: 'on', orders: 'on', catalog: 'on', media: 'hot', pay: 'on' },
+      pods: { auth: '×2', orders: '×2', catalog: '×2', media: '×12', pay: '×2' },
+      gwJob: 'route by path prefix',
+      m: { entry: '1', gw: '3', media: '12', blast: '—', p95: '145ms', broken: '0' } },
+
+    { t: 'One service dies, the product lives',
+      c: 'payment-svc gets OOM-killed. The gateway\'s <code>onError</code> returns <b>503 for /api/payments only</b>, with the request id attached so support can trace it. Browsing, login, search and uploads all keep working. Blast radius: one capability instead of the whole product.',
+      dim: ['n-broker'],
+      live: [['w-g-auth'],['w-g-orders'],['w-g-catalog'],['w-g-media']], dimWire: ['w-g-pay'], dbs: 1,
+      svc: { auth: 'on', orders: 'on', catalog: 'on', media: 'on', pay: 'dead' },
+      pods: { auth: '×2', orders: '×2', catalog: '×2', media: '×12', pay: '×0' },
+      gwJob: '503 fallback for /payments',
+      m: { entry: '1', gw: '3', media: '12', blast: '1 service', p95: '140ms', broken: '1 route' } },
+
+    { t: 'Push the slow work off the request path',
+      c: 'Checkout genuinely needs a payment answer, so that call stays synchronous. Everything else — confirmation email, invoice PDF, analytics, warehouse reservation — gets published to RabbitMQ and the response returns in <b>42ms</b>. Section 10 is entirely about this last move.',
+      dim: [],
+      live: [['w-g-orders'],['w-o-mq','green']], dbs: 1,
+      svc: { auth: 'on', orders: 'on', catalog: 'on', media: 'on', pay: 'on' },
+      pods: { auth: '×2', orders: '×2', catalog: '×2', media: '×12', pay: '×2' },
+      gwJob: 'route by path prefix',
+      m: { entry: '1', gw: '3', media: '12', blast: '1 service', p95: '42ms', broken: '0' } },
+  ];
+
+  let step = 0;
+  function render() {
+    const s = S[step];
+    document.getElementById('sol-title').textContent = s.t;
+    document.getElementById('sol-caption').innerHTML = s.c;
+    document.getElementById('sol-gw-job').textContent = s.gwJob;
+
+    ALL.forEach(id => {
+      const n = document.getElementById(id);
+      n.setAttribute('class', 'node' + (s.dim.includes(id) ? ' dim' : ''));
+    });
+    document.getElementById('sol-dbs').setAttribute('opacity', s.dbs);
+
+    SVCS.forEach(k => {
+      const rect = document.querySelector('.svc[data-svc="' + k + '"]');
+      const st = (s.svc && s.svc[k]) || '';
+      rect.setAttribute('class', 'node-shell svc' + (st === 'hot' ? ' hot' : st === 'dead' ? ' dead' : st === 'on' ? ' ok' : ''));
+      const pods = document.querySelector('.svc-pods[data-svc="' + k + '"]');
+      pods.textContent = (s.pods && s.pods[k]) || '×2';
+      pods.setAttribute('fill', st === 'dead' ? 'var(--accent)' : st === 'hot' ? 'var(--accent)' : 'var(--muted)');
+    });
+
+    document.querySelectorAll('#dg-sol .wire').forEach(w => { w.className.baseVal = 'wire'; });
+    (s.dimWire || []).forEach(id => { document.getElementById(id).className.baseVal = 'wire dim'; });
+    document.querySelectorAll('#dg-sol .wire-flow').forEach(w => { w.className.baseVal = 'wire-flow'; });
+    s.live.forEach(([id, mod]) => {
+      document.querySelectorAll('#dg-sol [data-wire="' + id + '"]').forEach(w => {
+        w.className.baseVal = 'wire-flow live' + (mod ? ' ' + mod : '');
+      });
+    });
+
+    setMetric('s-entry', s.m.entry);
+    setMetric('s-gw', s.m.gw);
+    setMetric('s-media', s.m.media, s.m.media === '12' ? 'warn' : '');
+    setMetric('s-blast', s.m.blast, s.m.blast === '1 service' ? 'warn' : '');
+    setMetric('s-p95', s.m.p95, s.m.p95 === '42ms' ? 'ok' : '');
+    setMetric('s-broken', s.m.broken, s.m.broken === '0' ? 'ok' : 'bad');
+
+    document.getElementById('sol-count').textContent = 'Step ' + (step + 1) + ' / ' + S.length;
+    document.getElementById('sol-prog').style.width = ((step + 1) / S.length * 100) + '%';
+    document.getElementById('sol-back').disabled = step === 0;
+    document.getElementById('sol-fwd').disabled = step === S.length - 1;
+  }
+  document.getElementById('sol-back').onclick = () => { if (step > 0) { step--; render(); } };
+  document.getElementById('sol-fwd').onclick  = () => { if (step < S.length - 1) { step++; render(); } };
+  render();
+})();
+
+/* ═══════════════ DIAGRAM 3 · RABBITMQ DECOUPLING ═══════════════ */
+(function () {
+  const QS = ['q1','q2','q3','q4'];
+  const MAXW = 154;
+
+  const S = [
+    { t: 'Publish once, return immediately',
+      c: 'order-svc saves the order, charges the card, then publishes <b>one</b> message to the exchange <code>orders</code> with routing key <code>order.created</code> — and returns. The publish takes about 2ms. It does not know who is listening, and it never checks whether anyone is alive.',
+      live: [['w-p-x']], dim: ['mq-q1','mq-q2','mq-q3','mq-q4','mq-c1','mq-c2','mq-c3','mq-c4'],
+      depths: { q1: [0,'0'], q2: [0,'0'], q3: [0,'0'], q4: [0,'0'] }, q4: false,
+      resp: 'responds in 42ms', respTone: 'var(--accent2)',
+      m: { resp: '42ms', knows: '0', depth: '0', lost: '0', fail: '0', changes: '0' } },
+
+    { t: 'The exchange routes by binding key',
+      c: 'A <b>topic</b> exchange compares the routing key against every binding. <code>order.*</code> matches, <code>order.created</code> matches exactly, <code>order.#</code> matches. Three queues each receive their own independent copy. The producer takes no part in this decision — it has already returned.',
+      live: [['w-x-q1'],['w-x-q2'],['w-x-q3']], dim: ['mq-c1','mq-c2','mq-c3','mq-q4','mq-c4'],
+      depths: { q1: [0.10,'12'], q2: [0.08,'9'], q3: [0.12,'14'], q4: [0,'0'] }, q4: false,
+      resp: 'responds in 42ms', respTone: 'var(--accent2)',
+      m: { resp: '42ms', knows: '0', depth: '12', lost: '0', fail: '0', changes: '0' } },
+
+    { t: 'Consumers work at their own pace',
+      c: 'Each service consumes from <b>its own</b> queue with <code>prefetch(10)</code>, does the work, then acks — only at that point is the message deleted. email-svc takes 600ms per message; analytics-svc takes 8ms. Neither slows the other, because they are not in a chain any more.',
+      live: [['w-q1-c1','green'],['w-q2-c2','green'],['w-q3-c3','green']], dim: ['mq-q4','mq-c4'],
+      depths: { q1: [0,'0'], q2: [0,'0'], q3: [0,'0'], q4: [0,'0'] }, q4: false,
+      resp: 'responds in 42ms', respTone: 'var(--accent2)',
+      m: { resp: '42ms', knows: '0', depth: '0', lost: '0', fail: '0', changes: '0' } },
+
+    { t: 'email-svc crashes',
+      c: 'The SMTP provider goes down and email-svc crashes with it. In the synchronous version this took <b>checkout</b> down with it. Here the queue simply stops draining. invoice-svc and analytics-svc have not noticed anything at all.',
+      live: [['w-x-q1','hot'],['w-x-q2'],['w-x-q3'],['w-q2-c2','green'],['w-q3-c3','green']],
+      dim: ['mq-q4','mq-c4'], dead: ['c1'],
+      depths: { q1: [0.38,'4,120'], q2: [0,'0'], q3: [0,'0'], q4: [0,'0'] }, q4: false,
+      resp: 'still 42ms', respTone: 'var(--accent2)',
+      m: { resp: '42ms', knows: '0', depth: '4,120', lost: '0', fail: '0', changes: '0' } },
+
+    { t: '30 minutes down — and nothing is lost',
+      c: 'Orders keep being placed and keep succeeding; the API is still answering in 42ms. Messages pile up in a durable, disk-backed <b>quorum queue</b>. The broker is acting as a shock absorber, holding pressure that would otherwise land on a service that cannot take it. This is <b>time decoupling</b>.',
+      live: [['w-x-q1','hot'],['w-x-q2'],['w-x-q3'],['w-q2-c2','green'],['w-q3-c3','green']],
+      dim: ['mq-q4','mq-c4'], dead: ['c1'],
+      depths: { q1: [0.92,'18,640'], q2: [0,'0'], q3: [0,'0'], q4: [0,'0'] }, q4: false,
+      resp: 'still 42ms', respTone: 'var(--accent2)',
+      m: { resp: '42ms', knows: '0', depth: '18,640', lost: '0', fail: '0', changes: '0' } },
+
+    { t: 'email-svc returns and drains the backlog',
+      c: 'The pod restarts, reconnects and resumes consuming exactly where it stopped. With <code>prefetch(10)</code> and three replicas it clears 18,000 messages in a few minutes. Zero messages lost, zero failed orders, zero manual intervention, zero pages at 3 AM.',
+      live: [['w-q1-c1','green'],['w-q2-c2','green'],['w-q3-c3','green']], dim: ['mq-q4','mq-c4'],
+      depths: { q1: [0.16,'2,140'], q2: [0,'0'], q3: [0,'0'], q4: [0,'0'] }, q4: false,
+      resp: 'responds in 42ms', respTone: 'var(--accent2)',
+      m: { resp: '42ms', knows: '0', depth: '2,140', lost: '0', fail: '0', changes: '0' } },
+
+    { t: 'New team, new consumer, zero producer changes',
+      c: 'The warehouse team wants order events. They declare their own queue, bind it to the exchange with <code>order.created</code>, and deploy. <b>Nobody opened order-svc. Nobody redeployed it. Nobody had a meeting about it.</b> That is <b>space decoupling</b>, and it is the whole reason a broker beats an HTTP fan-out.',
+      live: [['w-x-q4','green'],['w-q4-c4','green'],['w-p-x']], dim: [],
+      depths: { q1: [0,'0'], q2: [0,'0'], q3: [0,'0'], q4: [0.10,'8'] }, q4: true,
+      resp: 'responds in 42ms', respTone: 'var(--accent2)',
+      m: { resp: '42ms', knows: '0', depth: '0', lost: '0', fail: '0', changes: '0' } },
+  ];
+
+  const ALL = ['mq-prod','mq-x','mq-q1','mq-q2','mq-q3','mq-q4','mq-c1','mq-c2','mq-c3','mq-c4'];
+  let step = 0;
+
+  function render() {
+    const s = S[step];
+    document.getElementById('mq-title').textContent = s.t;
+    document.getElementById('mq-caption').innerHTML = s.c;
+    document.getElementById('mq-resp').textContent = s.resp;
+    document.getElementById('mq-resp').setAttribute('fill', s.respTone);
+
+    ALL.forEach(id => {
+      document.getElementById(id).setAttribute('class', 'node' + (s.dim.includes(id) ? ' dim' : ''));
+    });
+    document.getElementById('bk4').setAttribute('opacity', s.q4 ? '1' : '0');
+
+    QS.forEach(q => {
+      const [p, label] = s.depths[q];
+      const bar = document.querySelector('[data-bar="' + q + '"]');
+      bar.setAttribute('width', Math.round(p * MAXW));
+      bar.setAttribute('class', 'q-bar' + (p > 0.7 ? ' full' : p > 0.2 ? ' piling' : ''));
+      const num = document.querySelector('[data-depth="' + q + '"]');
+      num.textContent = label;
+      num.setAttribute('fill', p > 0.7 ? 'var(--accent)' : p > 0.2 ? 'var(--gold)' : 'var(--muted)');
+    });
+
+    ['c1','c2','c3','c4'].forEach(c => {
+      const r = document.querySelector('[data-c="' + c + '"]');
+      const isDead = (s.dead || []).includes(c);
+      r.setAttribute('class', 'node-shell' + (isDead ? ' dead' : ''));
+    });
+
+    document.querySelectorAll('#dg-mq .wire-flow').forEach(w => { w.className.baseVal = 'wire-flow'; });
+    s.live.forEach(([id, mod]) => {
+      document.querySelectorAll('#dg-mq [data-wire="' + id + '"]').forEach(w => {
+        w.className.baseVal = 'wire-flow live' + (mod ? ' ' + mod : '');
+      });
+    });
+
+    setMetric('q-resp', s.m.resp, 'ok');
+    setMetric('q-knows', s.m.knows, 'ok');
+    setMetric('q-depth', s.m.depth, s.m.depth === '18,640' ? 'bad' : s.m.depth === '0' ? 'ok' : 'warn');
+    setMetric('q-lost', s.m.lost, 'ok');
+    setMetric('q-fail', s.m.fail, 'ok');
+    setMetric('q-changes', s.m.changes, 'ok');
+
+    document.getElementById('mq-count').textContent = 'Step ' + (step + 1) + ' / ' + S.length;
+    document.getElementById('mq-prog').style.width = ((step + 1) / S.length * 100) + '%';
+    document.getElementById('mq-back').disabled = step === 0;
+    document.getElementById('mq-fwd').disabled = step === S.length - 1;
+  }
+  document.getElementById('mq-back').onclick = () => { if (step > 0) { step--; render(); } };
+  document.getElementById('mq-fwd').onclick  = () => { if (step < S.length - 1) { step++; render(); } };
+  render();
+})();
+
+/* ═══════════════ SCROLL SPY ═══════════════ */
+(function () {
+  const links = [...document.querySelectorAll('.nav-link')];
+  const map = {};
+  links.forEach(l => { map[l.getAttribute('href').slice(1)] = l; });
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        if (map[e.target.id]) map[e.target.id].classList.add('active');
+      }
+    });
+  }, { rootMargin: '-15% 0px -70% 0px' });
+  document.querySelectorAll('.section-block').forEach(s => obs.observe(s));
+})();
+</script>
+</body>
+</html>
