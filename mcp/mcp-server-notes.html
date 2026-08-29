@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCP Server — Sheryians Coding School</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Fraunces:ital,wght@0,300;0,600;0,700;0,900;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ── Design Tokens ── */
+:root {
+  --ink:       #0E0F14;
+  --paper:     #F5F2EB;
+  --paper2:    #EDE9DF;
+  --paper3:    #E4DFD3;
+  --rule:      #D4CEBC;
+  --muted:     #6B6455;
+  --accent:    #C84B1F;
+  --accent2:   #1A6B4A;
+  --accent3:   #1B4587;
+  --gold:      #B8860B;
+  --code-bg:   #1A1C24;
+  --code-text: #E2DCCC;
+  --flag-c:    #5BA4CF;
+  --val-c:     #F4A261;
+}
+
+/* ── Typography & Resets ── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background-color: var(--paper);
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* ── Keyframe Animations ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-up { animation: fadeUp 0.4s ease both; }
+
+/* ── Layout ── */
+.layout-container { display: flex; min-height: 100vh; }
+
+.sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  background-color: var(--ink);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 32px 0 40px;
+}
+
+.main-content {
+  flex: 1;
+  max-width: calc(100% - 260px);
+  padding: 56px 56px 80px;
+}
+
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .main-content { max-width: 100%; padding: 32px 24px 64px; }
+}
+
+/* ── Sidebar / Navigation ── */
+.nav-brand { padding: 0 24px; margin-bottom: 24px; }
+
+.nav-brand .logo {
+  font-family: 'Fraunces', serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.nav-brand .logo .accent-dot { color: var(--accent); }
+
+.nav-brand .sub {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.35);
+  letter-spacing: 0.06em;
+  margin-top: 2px;
+}
+
+.nav-group-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.25);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0 24px;
+  margin-top: 16px;
+  margin-bottom: 4px;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.5);
+  border-left: 2px solid transparent;
+  text-decoration: none;
+  transition: color 150ms ease, background-color 150ms ease;
+}
+
+.nav-link:hover {
+  color: #FFFFFF;
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+.nav-link.active {
+  color: #FFFFFF;
+  border-left-color: var(--accent);
+  background-color: rgba(200, 75, 31, 0.08);
+}
+
+.nav-num {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background-color: rgba(255, 255, 255, 0.08);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  border-radius: 4px;
+  color: inherit;
+}
+
+.nav-link:hover .nav-num,
+.nav-link.active .nav-num {
+  background-color: var(--accent);
+  color: #FFFFFF;
+}
+
+/* ── Hero ── */
+.hero {
+  margin-bottom: 64px;
+  padding-bottom: 40px;
+  border-bottom: 2px solid var(--rule);
+}
+
+.hero-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 16px;
+}
+
+.hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(36px, 5vw, 58px);
+  font-weight: 900;
+  color: var(--ink);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin: 0 0 20px;
+}
+
+.hero h1 em { font-style: normal; color: var(--accent); }
+
+.hero-desc {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  color: var(--muted);
+  max-width: 560px;
+  line-height: 1.65;
+}
+
+.hero-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 20px; }
+
+.hero-tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  border: 1px solid var(--rule);
+  border-radius: 9999px;
+  padding: 2px 12px;
+}
+
+/* ── Sections ── */
+.section-block { margin-bottom: 72px; scroll-margin-top: 24px; }
+
+.section-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.section-header-text { padding-top: 4px; }
+
+.section-num-big {
+  font-family: 'Fraunces', serif;
+  font-size: 48px;
+  font-weight: 900;
+  color: var(--rule);
+  user-select: none;
+  line-height: 1;
+}
+
+.section-title {
+  font-family: 'Fraunces', serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.2;
+}
+
+.section-subtitle {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-top: 28px;
+  margin-bottom: 12px;
+}
+
+p {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14.5px;
+  color: #2A2720;
+  line-height: 1.7;
+  margin: 0 0 12px;
+}
+
+code, .inline-code {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  color: var(--accent);
+  background-color: var(--paper3);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 2px 4px;
+}
+
+/* ── Concept Box ── */
+.concept-box {
+  background-color: var(--paper2);
+  border-left: 3px solid var(--accent3);
+  border-radius: 0 8px 8px 0;
+  padding: 16px 20px;
+  margin: 16px 0;
+}
+
+.concept-box-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  color: var(--accent3);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 8px;
+}
+
+.concept-box-text {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  color: var(--ink);
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* ── Note Box ── */
+.note-box {
+  background-color: #FEF9EC;
+  border: 1px solid #EDD97A;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 16px 0;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.note-box-icon { font-size: 18px; line-height: 1; margin-top: 2px; }
+
+.note-box-text {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: #5C4A00;
+  margin: 0;
+}
+
+.note-box-text strong { color: #3D3000; }
+
+/* ── Warning Box ── */
+.warning-box {
+  background-color: #FEF2F2;
+  border: 1px solid #FCA5A5;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 16px 0;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.warning-box-icon { font-size: 18px; line-height: 1; margin-top: 2px; }
+
+.warning-box-text {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: #7F1D1D;
+  margin: 0;
+}
+
+/* ── Badges ── */
+.badge {
+  display: inline-block;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  color: #FFFFFF;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 2px 10px;
+  border-radius: 4px;
+  margin-top: 24px;
+  margin-bottom: 8px;
+}
+
+.badge-accent { background-color: var(--accent); }
+.badge-green  { background-color: var(--accent2); }
+.badge-blue   { background-color: var(--accent3); }
+.badge-gold   { background-color: var(--gold); }
+
+/* ── Code Block ── */
+.code-block {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  margin: 16px 0;
+}
+
+.code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background-color: #13141A;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.code-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.code-copy-btn {
+  background: none;
+  border: none;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: color 150ms ease;
+}
+
+.code-copy-btn:hover { color: rgba(255, 255, 255, 0.7); }
+
+.code-pre {
+  background-color: var(--code-bg);
+  color: var(--code-text);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12.5px;
+  line-height: 1.75;
+  padding: 16px 20px;
+  overflow-x: auto;
+  margin: 0;
+}
+
+.token-command  { color: #87CEEB; font-weight: bold; }
+.token-flag     { color: #5BA4CF; }
+.token-val      { color: #F4A261; }
+.token-string   { color: #98C379; }
+.token-comment  { color: rgba(255, 255, 255, 0.3); font-style: italic; }
+.token-yaml-key { color: #C678DD; }
+.token-operator { color: #E5C07B; }
+
+/* ── Flag Table ── */
+.flag-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  margin: 16px 0;
+}
+
+.flag-table th {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background-color: var(--paper3);
+  text-align: left;
+  padding: 8px 12px;
+  border: 1px solid var(--rule);
+}
+
+.flag-table td { padding: 8px 12px; border: 1px solid var(--rule); font-size: 13px; }
+
+.flag-table tbody tr { transition: background-color 100ms ease; }
+.flag-table tbody tr:hover { background-color: var(--paper2); }
+
+.flag-name {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--flag-c);
+}
+
+.flag-val {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--val-c);
+}
+
+/* ── Compare Table ── */
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  margin: 16px 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.compare-table th {
+  background-color: var(--ink);
+  color: #FFFFFF;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  padding: 12px 16px;
+  border: 1px solid var(--ink);
+}
+
+.compare-table td { font-size: 13px; padding: 12px 16px; border: 1px solid var(--rule); }
+
+.compare-table tbody tr { transition: background-color 100ms ease; }
+.compare-table tbody tr:hover { background-color: var(--paper2); }
+
+.compare-table .cell-title { font-weight: 600; color: var(--ink); }
+.compare-table .cell-muted { color: var(--muted); }
+.compare-table .cell-highlight { color: var(--accent2); font-weight: 500; }
+
+/* ── Flow Diagram ── */
+.flow-diagram { display: flex; flex-direction: column; gap: 0; margin: 16px 0; }
+
+.flow-step { display: flex; gap: 16px; }
+
+.flow-connector { display: flex; flex-direction: column; align-items: center; }
+
+.flow-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+
+.flow-dot-accent { background-color: var(--accent); }
+.flow-dot-green  { background-color: var(--accent2); }
+
+.flow-line { width: 2px; background-color: var(--rule); flex: 1; margin: 4px 0; }
+
+.flow-content { padding-bottom: 16px; }
+
+.flow-title { font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; color: var(--ink); }
+
+.flow-desc { font-family: 'DM Sans', sans-serif; font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+
+/* ── Scale Diagram ── */
+.scale-diagram {
+  background-color: var(--paper2);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin: 16px 0;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  line-height: 2;
+  color: var(--muted);
+}
+
+.scale-diagram .highlight { color: var(--ink); font-weight: bold; }
+.scale-diagram .green     { color: var(--accent2); }
+.scale-diagram .red       { color: var(--accent); }
+
+/* ── Divider ── */
+.divider { border: none; border-top: 1px solid var(--rule); margin: 40px 0; }
+
+/* ── Footer ── */
+.site-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  border-top: 2px solid var(--rule);
+  padding-top: 16px;
+  margin-top: 64px;
+}
+
+/* ── Quiz ── */
+.quiz-box {
+  background-color: var(--ink);
+  border-radius: 12px;
+  padding: 24px;
+  margin: 32px 0;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.quiz-question {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  color: #FFFFFF;
+  font-weight: 500;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.quiz-options { display: flex; flex-direction: column; gap: 12px; }
+
+.quiz-option {
+  text-align: left;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13.5px;
+  color: rgba(255, 255, 255, 0.7);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 200ms ease;
+}
+
+.quiz-option:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: #FFFFFF;
+  background-color: rgba(200, 75, 31, 0.08);
+}
+
+.quiz-option.correct {
+  border-color: var(--accent2) !important;
+  background-color: rgba(26, 107, 74, 0.15) !important;
+  color: #FFFFFF !important;
+  opacity: 1 !important;
+}
+
+.quiz-option.incorrect {
+  border-color: var(--accent) !important;
+  background-color: rgba(200, 75, 31, 0.15) !important;
+  color: #FFFFFF !important;
+  opacity: 1 !important;
+}
+
+.cursor-not-allowed { cursor: not-allowed; }
+
+.quiz-feedback {
+  margin-top: 16px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.quiz-feedback.correct   { color: var(--accent2); }
+.quiz-feedback.incorrect { color: var(--accent); }
+.quiz-feedback.hidden    { display: none; }
+</style>
+</head>
+<body>
+<div class="layout-container">
+
+  <!-- ───────── Sidebar ───────── -->
+  <nav class="sidebar">
+    <div class="nav-brand">
+      <div class="logo">MCP<span class="accent-dot">.</span>Server</div>
+      <div class="sub">Sheryians Coding School</div>
+    </div>
+
+    <div class="nav-group-label">Foundations</div>
+    <a href="#the-problem" class="nav-link active"><span class="nav-num">1</span>The Problem</a>
+    <a href="#the-solution" class="nav-link"><span class="nav-num">2</span>The Solution — MCP</a>
+
+    <div class="nav-group-label">Build</div>
+    <a href="#server-setup" class="nav-link"><span class="nav-num">3</span>Server Setup (Express)</a>
+    <a href="#connect-agent" class="nav-link"><span class="nav-num">4</span>Connect the Agent</a>
+
+    <div class="nav-group-label">Go Deeper</div>
+    <a href="#transports" class="nav-link"><span class="nav-num">5</span>Transports — STDIO vs Remote</a>
+    <a href="#capabilities" class="nav-link"><span class="nav-num">6</span>Tools · Resources · Prompts</a>
+  </nav>
+
+  <!-- ───────── Main ───────── -->
+  <main class="main-content">
+
+    <!-- Hero -->
+    <header class="hero animate-fade-up">
+      <div class="hero-eyebrow">Agentic AI · Model Context Protocol</div>
+      <h1>Build tools once.<br>Use them <em>everywhere</em>.</h1>
+      <p class="hero-desc">
+        Every AI app in the world is rewriting the same tools for the same APIs.
+        MCP fixes that. As always — problem first, solution later.
+      </p>
+      <div class="hero-tags">
+        <span class="hero-tag">Model Context Protocol</span>
+        <span class="hero-tag">Express · Streamable HTTP</span>
+        <span class="hero-tag">LangChain · Mistral</span>
+      </div>
+    </header>
+
+    <!-- ═══════════ 01 · THE PROBLEM ═══════════ -->
+    <section class="section-block animate-fade-up" id="the-problem">
+      <div class="section-header">
+        <div class="section-num-big">01</div>
+        <div class="section-header-text">
+          <div class="section-title">The Problem</div>
+          <div class="section-subtitle">Why does MCP even exist? Meet the Google Calendar situation.</div>
+        </div>
+      </div>
+
+      <p>
+        Suppose you are building an AI chat application. You want your agent to work with
+        <strong>Google Calendar</strong> — create events, check the schedule, all of it.
+      </p>
+      <p>
+        So you sit down and write tools for your agent: read the Google Calendar API docs,
+        handle authentication, write a <code>create_event</code> tool, a <code>list_events</code>
+        tool, test everything, fix the bugs. A few days of work.
+      </p>
+      <p>
+        Here is the thing — <strong>you are not alone.</strong> Hundreds of companies are building
+        their own AI chat applications, and they all decide the same thing: "our agent should work
+        with Google Calendar." So hundreds of teams write the <em>exact same tools</em>, against the
+        <em>exact same API</em>, fixing the <em>exact same bugs</em>.
+      </p>
+
+      <div class="scale-diagram">
+        <span class="highlight">Company 1</span>  →  writes Google Calendar tools<br>
+        <span class="highlight">Company 2</span>  →  writes the same tools again<br>
+        <span class="highlight">Company 3</span>  →  writes the same tools again<br>
+        <span class="highlight">... Company 500</span>  →  same tools, again<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+        Google changes the API<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+        <span class="red">500 codebases break. 500 teams fix the same bug. ❌</span>
+      </div>
+
+      <p>
+        And Calendar is just one service. Your agent also wants Gmail, Slack, GitHub, Notion...
+        every AI app × every service = a separate integration. This is called the
+        <strong>M × N problem</strong>.
+      </p>
+
+      <div class="concept-box">
+        <div class="concept-box-label">Key Concept — The M × N Problem</div>
+        <p class="concept-box-text">
+          <strong>M</strong> AI applications wanting to talk to <strong>N</strong> services means
+          <strong>M × N</strong> custom integrations. 100 apps × 10 services = 1000 copies of
+          basically the same tool code, all maintained separately.
+        </p>
+      </div>
+
+      <div class="quiz-box">
+        <p class="quiz-question">
+          In the Google Calendar story, what exactly are hundreds of companies repeating?
+        </p>
+        <div class="quiz-options" id="quiz-prob-1">
+          <button onclick="answerQuiz('quiz-prob-1', this, false)" class="quiz-option">
+            A &nbsp;—&nbsp; Training their own AI models from scratch
+          </button>
+          <button onclick="answerQuiz('quiz-prob-1', this, true)" class="quiz-option">
+            B &nbsp;—&nbsp; Writing the same Calendar tools again and again
+          </button>
+        </div>
+        <div class="quiz-feedback hidden" id="quiz-prob-1-feedback"></div>
+      </div>
+
+      <div class="quiz-box">
+        <p class="quiz-question">
+          10 AI apps each integrate 6 services directly. How many integrations must be built and maintained?
+        </p>
+        <div class="quiz-options" id="quiz-prob-2">
+          <button onclick="answerQuiz('quiz-prob-2', this, true)" class="quiz-option">
+            A &nbsp;—&nbsp; 60 — every app builds every integration (M × N)
+          </button>
+          <button onclick="answerQuiz('quiz-prob-2', this, false)" class="quiz-option">
+            B &nbsp;—&nbsp; 16 — integrations are shared automatically (M + N)
+          </button>
+        </div>
+        <div class="quiz-feedback hidden" id="quiz-prob-2-feedback"></div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 02 · THE SOLUTION ═══════════ -->
+    <section class="section-block animate-fade-up" id="the-solution">
+      <div class="section-header">
+        <div class="section-num-big">02</div>
+        <div class="section-header-text">
+          <div class="section-title">The Solution — MCP Server</div>
+          <div class="section-subtitle">Google flips the model: the tools move to Google's side.</div>
+        </div>
+      </div>
+
+      <p>
+        Now Google looks at this mess and makes a decision: <strong>"we will build a server with
+        tools."</strong> Not an AI. No model, no agent — <em>just tools</em>.
+      </p>
+      <p>
+        These are the same kind of tools we already write for our agents. The difference?
+        They are <strong>not created on our server</strong>. They live on
+        <strong>Google's own server</strong>, and they have direct access to Google's API.
+      </p>
+      <p>
+        What does this protect us from? Hundreds of companies no longer write the same tools
+        again and again. Google writes the tools <strong>once</strong>, and everyone connects
+        their agent to them.
+      </p>
+
+      <div class="scale-diagram">
+        <span class="green">Google writes the Calendar tools ONCE</span>  →  MCP Server<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+        Your agent  →  connects<br>
+        Claude / Cursor / ChatGPT  →  connect<br>
+        <span class="highlight">Company 1 ... 500</span>  →  connect<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+        <span class="green">Google updates one server → everyone gets the fix ✅</span>
+      </div>
+
+      <div class="concept-box">
+        <div class="concept-box-label">Key Concept — MCP</div>
+        <p class="concept-box-text">
+          <strong>MCP (Model Context Protocol)</strong> is an open standard that defines
+          <strong>one unified structure</strong> for exposing tools to AI systems.
+          An <strong>MCP server</strong> exposes the tools; an <strong>MCP client</strong>
+          (inside your AI app) consumes them. Build tools once — use them with any AI system.
+        </p>
+      </div>
+
+      <p>
+        Think of it like <strong>USB-C</strong>. Before USB-C, every device needed its own charger.
+        One standard port later — any charger works with any device. MCP is that port, but for
+        connecting AI apps to services.
+      </p>
+
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>What</th>
+            <th>Without MCP</th>
+            <th>With MCP</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="cell-title">Who writes the tools</td>
+            <td class="cell-muted">Every company, separately</td>
+            <td class="cell-highlight">The service provider, once ✓</td>
+          </tr>
+          <tr>
+            <td class="cell-title">Where tools live</td>
+            <td class="cell-muted">Inside each app's codebase</td>
+            <td class="cell-highlight">On the provider's MCP server ✓</td>
+          </tr>
+          <tr>
+            <td class="cell-title">API changes</td>
+            <td class="cell-muted">Break hundreds of codebases</td>
+            <td class="cell-highlight">Fixed in one place, for everyone ✓</td>
+          </tr>
+          <tr>
+            <td class="cell-title">Integrations needed</td>
+            <td class="cell-muted">M × N</td>
+            <td class="cell-highlight">M + N ✓</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="note-box">
+        <div class="note-box-icon">💡</div>
+        <p class="note-box-text">
+          MCP was created by <strong>Anthropic</strong> (the makers of Claude) in late 2024 as an
+          open protocol. Today it's adopted across the industry — which is exactly why learning it once pays off everywhere.
+        </p>
+      </div>
+
+      <div class="quiz-box">
+        <p class="quiz-question">
+          What does Google's MCP server contain?
+        </p>
+        <div class="quiz-options" id="quiz-sol-1">
+          <button onclick="answerQuiz('quiz-sol-1', this, true)" class="quiz-option">
+            A &nbsp;—&nbsp; Just tools with access to Google's API — no AI
+          </button>
+          <button onclick="answerQuiz('quiz-sol-1', this, false)" class="quiz-option">
+            B &nbsp;—&nbsp; Its own LLM that answers calendar questions
+          </button>
+        </div>
+        <div class="quiz-feedback hidden" id="quiz-sol-1-feedback"></div>
+      </div>
+
+      <div class="quiz-box">
+        <p class="quiz-question">
+          In the MCP setup, where do the Google Calendar tools actually run?
+        </p>
+        <div class="quiz-options" id="quiz-sol-2">
+          <button onclick="answerQuiz('quiz-sol-2', this, false)" class="quiz-option">
+            A &nbsp;—&nbsp; Inside your agent's codebase
+          </button>
+          <button onclick="answerQuiz('quiz-sol-2', this, true)" class="quiz-option">
+            B &nbsp;—&nbsp; On Google's own server
+          </button>
+        </div>
+        <div class="quiz-feedback hidden" id="quiz-sol-2-feedback"></div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 03 · SERVER SETUP ═══════════ -->
+    <section class="section-block animate-fade-up" id="server-setup">
+      <div class="section-header">
+        <div class="section-num-big">03</div>
+        <div class="section-header-text">
+          <div class="section-title">Server Setup — Remote MCP with Express</div>
+          <div class="section-subtitle">Let's be "Google" for a minute — build our own MCP server that serves a weather tool.</div>
+        </div>
+      </div>
+
+      <div class="badge badge-blue">Step 0 — Project Structure</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-label">Files</span>
+          <button onclick="copyCode(this)" class="code-copy-btn">copy</button>
+        </div>
+        <pre class="code-pre">mcp-server/
+├── app/
+│   └── app.ts          <span class="token-comment"># express app + /mcp endpoint</span>
+├── mcp/
+│   └── mcp.server.ts   <span class="token-comment"># MCP server + tools</span>
+└── server.ts           <span class="token-comment"># starts the server</span>
+
+mcp-client/
+└── agent.ts            <span class="token-comment"># LangChain agent that uses the server</span></pre>
+      </div>
+
+      <div class="badge badge-accent">Step 1 — Install</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-label">Terminal</span>
+          <button onclick="copyCode(this)" class="code-copy-btn">copy</button>
+        </div>
+        <pre class="code-pre"><span class="token-comment"># server side</span>
+<span class="token-command">npm</span> <span class="token-flag">install</span> <span class="token-val">express zod @modelcontextprotocol/server @modelcontextprotocol/node</span>
+
+<span class="token-comment"># client side</span>
+<span class="token-command">npm</span> <span class="token-flag">install</span> <span class="token-val">langchain @langchain/mistralai @langchain/mcp-adapters</span></pre>
+      </div>
+
+      <div class="badge badge-accent">Step 2 — Create the MCP Server + a Tool</div>
+      <p>
+        This is the heart of everything. <code>registerTool</code> here is the MCP version of the
+        tools we've been writing for our LangChain agents — same idea, unified structure.
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-label">mcp/mcp.server.ts</span>
+          <button onclick="copyCode(this)" class="code-copy-btn">copy</button>
+        </div>
+        <pre class="code-pre"><span class="token-flag">import</span> { <span class="token-command">McpServer</span> } <span class="token-flag">from</span> <span class="token-string">"@modelcontextprotocol/server"</span>
+<span class="token-flag">import</span> * <span class="token-flag">as</span> z <span class="token-flag">from</span> <span class="token-string">"zod/v4"</span>
+
+<span class="token-flag">export function</span> <span class="token-command">getMcpServer</span>() {
+
+    <span class="token-flag">const</span> mcpServer = <span class="token-flag">new</span> <span class="token-command">McpServer</span>({
+        <span class="token-yaml-key">name:</span> <span class="token-string">"weather"</span>,
+        <span class="token-yaml-key">version:</span> <span class="token-string">"1.0.0"</span>,
+    })
+
+    mcpServer.<span class="token-command">registerTool</span>(
+        <span class="token-string">"get_weather"</span>,
+        {
+            <span class="token-yaml-key">title:</span> <span class="token-string">"Get Weather"</span>,
+            <span class="token-yaml-key">description:</span> <span class="token-string">"Get the current weather for a given city."</span>,
+            <span class="token-yaml-key">inputSchema:</span> z.object({
+                <span class="token-yaml-key">city:</span> z.string().describe(<span class="token-string">"The name of the city to get the weather for."</span>),
+            }),
+            <span class="token-yaml-key">outputSchema:</span> z.object({
+                <span class="token-yaml-key">temperature:</span> z.number().describe(<span class="token-string">"The current temperature in Celsius."</span>),
+                <span class="token-yaml-key">description:</span> z.string().describe(<span class="token-string">"A brief description of the current weather."</span>),
+            }),
+        },
+        <span class="token-flag">async</span> ({ city }) => {
+            <span class="token-flag">return</span> {
+                <span class="token-yaml-key">content:</span> [{
+                    <span class="token-yaml-key">type:</span> <span class="token-string">"text"</span>,
+                    <span class="token-yaml-key">text:</span> <span class="token-string">`The current weather in ${city} is 25°C and sunny.`</span>,
+                }],
+                <span class="token-yaml-key">structuredContent:</span> {
+                    <span class="token-yaml-key">temperature:</span> <span class="token-val">25</span>,
+                    <span class="token-yaml-key">description:</span> <span class="token-string">"sunny"</span>
+                }
+            }
+        }
+    )
+
+    <span class="token-flag">return</span> mcpServer
+}</pre>
+      </div>
+
+      <table class="flag-table">
+        <thead>
+          <tr>
+            <th>Part</th>
+            <th>Value Used</th>
+            <th>What it does</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="flag-name">name</span></td>
+            <td><span class="flag-val">"get_weather"</span></td>
+            <td>The tool's unique id. The model calls it by this exact name.</td>
+          </tr>
+          <tr>
+            <td><span class="flag-name">description</span></td>
+            <td><span class="flag-val">"Get the current weather..."</span></td>
+            <td>What the model reads to <strong>decide</strong> whether to call this tool. Write it well.</td>
+          </tr>
+          <tr>
+            <td><span class="flag-name">inputSchema</span></td>
+            <td><span class="flag-val">z.object({ city })</span></td>
+            <td>Zod schema of arguments the model must send. The model sees this shape.</td>
+          </tr>
+          <tr>
+            <td><span class="flag-name">outputSchema</span></td>
+            <td><span class="flag-val">z.object({ temperature, description })</span></td>
+            <td>Zod schema of the structured result the tool promises to return.</td>
+          </tr>
+          <tr>
+            <td><span class="flag-name">handler</span></td>
+            <td><span class="flag-val">async ({ city }) => {...}</span></td>
+            <td>The function that actually runs. In real life, this is where you'd hit the weather API.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="note-box">
+        <div class="note-box-icon">💡</div>
+        <p class="note-box-text">
+          The handler returns two things: <strong>content</strong> — plain text for the model to read —
+          and <strong>structuredContent</strong> — clean JSON matching <strong>outputSchema</strong>,
+          which the client app can use directly without parsing text.
+        </p>
+      </div>
+
+      <div class="badge badge-accent">Step 3 — Mount it on Express</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-label">app/app.ts</span>
+          <button onclick="copyCode(this)" class="code-copy-btn">copy</button>
+        </div>
+        <pre class="code-pre"><span class="token-flag">import</span> express <span class="token-flag">from</span> <span class="token-string">'express'</span>;
+<span class="token-flag">import type</span> { Request, Response } <span class="token-flag">from</span> <span class="token-string">'express'</span>;
+<span class="token-flag">import</span> { <span class="token-command">createMcpHandler</span> } <span class="token-flag">from</span> <span class="token-string">'@modelcontextprotocol/server'</span>;
+<span class="token-flag">import</span> { <span class="token-command">toNodeHandler</span> } <span class="token-flag">from</span> <span class="token-string">'@modelcontextprotocol/node'</span>;
+<span class="token-flag">import</span> { <span class="token-command">getMcpServer</span> } <span class="token-flag">from</span> <span class="token-string">'../mcp/mcp.server.js'</span>;
+
+<span class="token-flag">const</span> app = <span class="token-command">express</span>();
+
+app.use(express.json());
+
+<span class="token-comment">// every MCP request lands on this ONE endpoint</span>
+<span class="token-flag">const</span> node = <span class="token-command">toNodeHandler</span>(<span class="token-command">createMcpHandler</span>(() => <span class="token-command">getMcpServer</span>()));
+app.all(<span class="token-string">'/mcp'</span>, (req, res) => <span class="token-flag">void</span> node(req, res, req.body));
+
+<span class="token-flag">export default</span> app;</pre>
+      </div>
+
+      <div class="concept-box">
+        <div class="concept-box-label">Key Concept — One Endpoint</div>
+        <p class="concept-box-text">
+          An MCP server doesn't have routes like <strong>/tools</strong> or <strong>/weather</strong>.
+          Everything — list the tools, call a tool — arrives on a single endpoint
+          (<strong>/mcp</strong>). <strong>createMcpHandler</strong> turns our McpServer into a web
+          handler, and <strong>toNodeHandler</strong> adapts it to Express's req/res style.
+        </p>
+      </div>
+
+      <div class="badge badge-accent">Step 4 — Run it</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-label">server.ts</span>
+          <button onclick="copyCode(this)" class="code-copy-btn">copy</button>
+        </div>
+        <pre class="code-pre"><span class="token-flag">import</span> app <span class="token-flag">from</span> <span class="token-string">'./app/app.js'</span>;
+
+app.<span class="token-command">listen</span>(<span class="token-val">3000</span>, () => {
+  console.log(<span class="token-string">'Server is running on port 3000'</span>);
+});</pre>
+      </div>
+
+      <div class="badge badge-green">Verify</div>
+      <p>
+        Run it with <code>npx tsx server.ts</code>. Nothing to see in the browser — an MCP server
+        has no UI. It just sits at <code>http://localhost:3000/mcp</code> waiting for an MCP client
+        to connect. That client is next.
+      </p>
+
+      <div class="quiz-box">
+        <p class="quiz-question">
+          In our Express setup, which single endpoint receives ALL MCP requests?
+        </p>
+        <div class="quiz-options" id="quiz-setup-1">
+          <button onclick="answerQuiz('quiz-setup-1', this, true)" class="quiz-option">
+            A &nbsp;—&nbsp; /mcp — one endpoint for everything
+          </button>
+          <button onclick="answerQuiz('quiz-setup-1', this, false)" class="quiz-option">
+            B &nbsp;—&nbsp; /tools for listing and /call for calling
+          </button>
+        </div>
+        <div class="quiz-feedback hidden" id="quiz-setup-1-feedback"></div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 04 · CONNECT THE AGENT ═══════════ -->
+    <section class="section-block animate-fade-up" id="connect-agent">
+      <div class="section-header">
+        <div class="section-num-big">04</div>
+        <div class="section-header-text">
+          <div class="section-title">Connect the Agent</div>
+          <div class="section-subtitle">Any MCP client can use our server — Claude, Cursor, or our own LangChain agent.</div>
+        </div>
+      </div>
+
+      <p>
+        Our server is live. Now we play the other role — the AI application. The
+        <code>MultiServerMCPClient</code> connects to one or more MCP servers and hands their
+        tools to our agent as if we had written them ourselves.
+      </p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-label">mcp-client/agent.ts</span>
+          <button onclick="copyCode(this)" class="code-copy-btn">copy</button>
+        </div>
+        <pre class="code-pre"><span class="token-flag">import</span> { <span class="token-command">createAgent</span>, <span class="token-command">HumanMessage</span> } <span class="token-flag">from</span> <span class="token-string">"langchain"</span>;
+<span class="token-flag">import</span> { <span class="token-command">ChatMistralAI</span> } <span class="token-flag">from</span> <span class="token-string">"@langchain/mistralai"</span>
+<span class="token-flag">import</span> { <span class="token-command">MultiServerMCPClient</span> } <span class="token-flag">from</span> <span class="token-string">"@langchain/mcp-adapters"</span>;
+
+<span class="token-comment">// 1. connect to the MCP server</span>
+<span class="token-flag">const</span> client = <span class="token-flag">new</span> <span class="token-command">MultiServerMCPClient</span>({
+    <span class="token-yaml-key">mcpServers:</span> {
+        <span class="token-yaml-key">weather:</span> {
+            <span class="token-yaml-key">url:</span> <span class="token-string">"http://localhost:3000/mcp"</span>,
+        }
+    },
+});
+
+<span class="token-comment">// 2. pull its tools — they arrive as normal LangChain tools</span>
+<span class="token-flag">const</span> tools = <span class="token-flag">await</span> client.<span class="token-command">getTools</span>();
+
+<span class="token-comment">// 3. model + agent — same as always</span>
+<span class="token-flag">const</span> model = <span class="token-flag">new</span> <span class="token-command">ChatMistralAI</span>({
+    <span class="token-yaml-key">model:</span> <span class="token-string">"mistral-small-latest"</span>,
+    <span class="token-yaml-key">temperature:</span> <span class="token-val">0</span>,
+    <span class="token-yaml-key">apiKey:</span> process.env.<span class="token-val">MISTRAL_API_KEY</span>,
+});
+
+<span class="token-flag">const</span> agent = <span class="token-command">createAgent</span>({ model, tools });
+
+<span class="token-flag">const</span> response = <span class="token-flag">await</span> agent.<span class="token-command">invoke</span>({
+    <span class="token-yaml-key">messages:</span> [<span class="token-flag">new</span> <span class="token-command">HumanMessage</span>(<span class="token-string">"Weather of Bhopal ?"</span>)],
+})
+
+console.log(<span class="token-string">"Response from agent:"</span>, response);</pre>
+      </div>
+
+      <div class="warning-box">
+        <div class="warning-box-icon">⚠️</div>
+        <p class="warning-box-text">
+          <strong>Never hardcode API keys</strong> in your source files. One git push and the key is
+          public forever. Keep it in an environment variable
+          (<strong>process.env.MISTRAL_API_KEY</strong>) and put your <strong>.env</strong> file in
+          <strong>.gitignore</strong>.
+        </p>
+      </div>
+
+      <h3>What actually happens when you run this</h3>
+      <div class="flow-diagram">
+        <div class="flow-step">
+          <div class="flow-connector">
+            <div class="flow-dot flow-dot-accent"></div>
+            <div class="flow-line"></div>
+          </div>
+          <div class="flow-content">
+            <div class="flow-title">You ask: "Weather of Bhopal?"</div>
+            <div class="flow-desc">The message goes to the agent.</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-connector">
+            <div class="flow-dot flow-dot-accent"></div>
+            <div class="flow-line"></div>
+          </div>
+          <div class="flow-content">
+            <div class="flow-title">Model sees get_weather in its tool list</div>
+            <div class="flow-desc">client.getTools() already fetched every tool + description from the server.</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-connector">
+            <div class="flow-dot flow-dot-accent"></div>
+            <div class="flow-line"></div>
+          </div>
+          <div class="flow-content">
+            <div class="flow-title">Model decides to call get_weather({ city: "Bhopal" })</div>
+            <div class="flow-desc">The description + inputSchema told it how.</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-connector">
+            <div class="flow-dot flow-dot-accent"></div>
+            <div class="flow-line"></div>
+          </div>
+          <div class="flow-content">
+            <div class="flow-title">MCP client sends the call to http://localhost:3000/mcp</div>
+            <div class="flow-desc">Over the network — the tool code never lived in our agent.</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-connector">
+            <div class="flow-dot flow-dot-accent"></div>
+            <div class="flow-line"></div>
+          </div>
+          <div class="flow-content">
+            <div class="flow-title">Server runs the handler, returns content + structuredContent</div>
+            <div class="flow-desc">"The current weather in Bhopal is 25°C and sunny."</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-connector">
+            <div class="flow-dot flow-dot-green"></div>
+          </div>
+          <div class="flow-content">
+            <div class="flow-title">Model reads the result and writes the final answer</div>
+            <div class="flow-desc">To the agent, an MCP tool is just... a tool. That's the whole point.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="quiz-box">
+        <p class="quiz-question">
+          What does client.getTools() give to our agent?
+        </p>
+        <div class="quiz-options" id="quiz-client-1">
+          <button onclick="answerQuiz('quiz-client-1', this, true)" class="quiz-option">
+            A &nbsp;—&nbsp; The server's tools, converted into normal LangChain tools
+          </button>
+          <button onclick="answerQuiz('quiz-client-1', this, false)" class="quiz-option">
+            B &nbsp;—&nbsp; A copy of the server's source code to run locally
+          </button>
+        </div>
+        <div class="quiz-feedback hidden" id="quiz-client-1-feedback"></div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 05 · TRANSPORTS ═══════════ -->
+    <section class="section-block animate-fade-up" id="transports">
+      <div class="section-header">
+        <div class="section-num-big">05</div>
+        <div class="section-header-text">
+          <div class="section-title">Transports — STDIO vs Remote</div>
+          <div class="section-subtitle">Client and server are separate programs. How do they talk?</div>
+        </div>
+      </div>
+
+      <div class="concept-box">
+        <div class="concept-box-label">Key Concept — Transport</div>
+        <p class="concept-box-text">
+          A <strong>transport</strong> is the channel that carries messages between the MCP client
+          and the MCP server. MCP defines two: <strong>STDIO</strong> (local) and
+          <strong>Streamable HTTP</strong> (remote). Same tools, same protocol — only the
+          "wire" changes.
+        </p>
+      </div>
+
+      <h3>STDIO — the local MCP server</h3>
+      <p>
+        The server is just a program on <strong>your own machine</strong>. The client (say, Claude
+        Desktop or Cursor) <em>starts it as a child process</em> and they talk through
+        <code>stdin</code> / <code>stdout</code> — the same channels <code>console.log</code> uses.
+        No port, no network, no HTTP.
+      </p>
+
+      <h3>Remote — the MCP server over Streamable HTTP</h3>
+      <p>
+        The server runs on <strong>someone else's machine</strong> — Google's, or your company's
+        cloud. It exposes one HTTP endpoint (our <code>/mcp</code>), and clients from anywhere in
+        the world connect over the network. This is what we built with Express — and what Google
+        would build for Calendar.
+      </p>
+
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>What</th>
+            <th>STDIO (Local)</th>
+            <th>Remote (Streamable HTTP)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="cell-title">Where it runs</td>
+            <td class="cell-muted">Your own machine, as a child process</td>
+            <td class="cell-muted">Any server on the internet</td>
+          </tr>
+          <tr>
+            <td class="cell-title">How they talk</td>
+            <td class="cell-muted">stdin / stdout pipes</td>
+            <td class="cell-muted">HTTP requests to one endpoint (/mcp)</td>
+          </tr>
+          <tr>
+            <td class="cell-title">Who starts the server</td>
+            <td class="cell-muted">The client starts it automatically</td>
+            <td class="cell-muted">It's already running, deployed like any web server</td>
+          </tr>
+          <tr>
+            <td class="cell-title">How many users</td>
+            <td class="cell-muted">One — just you</td>
+            <td class="cell-muted">Many — hundreds of companies at once</td>
+          </tr>
+          <tr>
+            <td class="cell-title">Auth</td>
+            <td class="cell-muted">Usually not needed — it's your machine</td>
+            <td class="cell-muted">Needed for real services (OAuth, API keys)</td>
+          </tr>
+          <tr>
+            <td class="cell-title">Example</td>
+            <td class="cell-muted">A filesystem server reading your local files</td>
+            <td class="cell-muted">Google Calendar MCP, GitHub MCP, our Express server</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="note-box">
+        <div class="note-box-icon">💡</div>
+        <p class="note-box-text">
+          <strong>When to use what:</strong> tools that need <strong>your machine</strong>
+          (local files, local DB, personal scripts) → <strong>STDIO</strong>. Tools serving
+          <strong>many users over the internet</strong> (a company's API, a product) →
+          <strong>Remote</strong>. That's why Google's Calendar server must be remote.
+        </p>
+      </div>
+
+      <div class="quiz-box">
+        <p class="quiz-question">
+          Your MCP server must be used by hundreds of companies over the internet. Which transport?
+        </p>
+        <div class="quiz-options" id="quiz-tr-1">
+          <button onclick="answerQuiz('quiz-tr-1', this, false)" class="quiz-option">
+            A &nbsp;—&nbsp; STDIO — spawn a process on every company's laptop
+          </button>
+          <button onclick="answerQuiz('quiz-tr-1', this, true)" class="quiz-option">
+            B &nbsp;—&nbsp; Remote (Streamable HTTP) — one deployed server, everyone connects
+          </button>
+        </div>
+        <div class="quiz-feedback hidden" id="quiz-tr-1-feedback"></div>
+      </div>
+
+      <div class="quiz-box">
+        <p class="quiz-question">
+          How does an STDIO MCP server communicate with its client?
+        </p>
+        <div class="quiz-options" id="quiz-tr-2">
+          <button onclick="answerQuiz('quiz-tr-2', this, true)" class="quiz-option">
+            A &nbsp;—&nbsp; Through stdin / stdout of a local child process
+          </button>
+          <button onclick="answerQuiz('quiz-tr-2', this, false)" class="quiz-option">
+            B &nbsp;—&nbsp; Through HTTP requests on port 3000
+          </button>
+        </div>
+        <div class="quiz-feedback hidden" id="quiz-tr-2-feedback"></div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 06 · CAPABILITIES ═══════════ -->
+    <section class="section-block animate-fade-up" id="capabilities">
+      <div class="section-header">
+        <div class="section-num-big">06</div>
+        <div class="section-header-text">
+          <div class="section-title">What MCP Provides — Tools, Resources, Prompts</div>
+          <div class="section-subtitle">Tools are just one of three things an MCP server can expose.</div>
+        </div>
+      </div>
+
+      <p>
+        We built tools today, but an MCP server can serve three kinds of capabilities.
+        An easy way to remember: <strong>Tools do things. Resources know things.
+        Prompts say things.</strong>
+      </p>
+
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Capability</th>
+            <th>What it is</th>
+            <th>Who controls it</th>
+            <th>Example</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="cell-title">Tools</td>
+            <td class="cell-muted">Functions the model can call to take an action</td>
+            <td class="cell-highlight">The model decides</td>
+            <td class="cell-muted">create_event, get_weather</td>
+          </tr>
+          <tr>
+            <td class="cell-title">Resources</td>
+            <td class="cell-muted">Read-only data attached to the model as context</td>
+            <td class="cell-highlight">The application decides</td>
+            <td class="cell-muted">today's events list, a file, a DB record</td>
+          </tr>
+          <tr>
+            <td class="cell-title">Prompts</td>
+            <td class="cell-muted">Ready-made prompt templates written by the server author</td>
+            <td class="cell-highlight">The user decides</td>
+            <td class="cell-muted">a "plan-my-week" template (like slash commands)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Resources vs Prompts — when to use what</h3>
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>What</th>
+            <th>Resources</th>
+            <th>Prompts</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="cell-title">Gives the model</td>
+            <td class="cell-muted">Data to read (content / context)</td>
+            <td class="cell-muted">Instructions to follow (a reusable template)</td>
+          </tr>
+          <tr>
+            <td class="cell-title">Triggered by</td>
+            <td class="cell-muted">The application attaches it automatically</td>
+            <td class="cell-muted">The user picks it, like a slash command</td>
+          </tr>
+          <tr>
+            <td class="cell-title">Side effects</td>
+            <td class="cell-muted">None — strictly read-only</td>
+            <td class="cell-muted">None by itself — it only shapes the model's next reply</td>
+          </tr>
+          <tr>
+            <td class="cell-title">Use it when</td>
+            <td class="cell-highlight">The model needs to SEE data before answering ✓</td>
+            <td class="cell-highlight">The same well-written prompt is needed again and again ✓</td>
+          </tr>
+          <tr>
+            <td class="cell-title">Calendar example</td>
+            <td class="cell-muted">calendar://events/today — the raw list of events</td>
+            <td class="cell-muted">"Summarize my day and flag conflicts" template</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="note-box">
+        <div class="note-box-icon">💡</div>
+        <p class="note-box-text">
+          Registering them looks just like tools: <strong>registerResource()</strong> and
+          <strong>registerPrompt()</strong> on the same McpServer. If it should
+          <strong>change</strong> something → Tool. If it should be <strong>read</strong> →
+          Resource. If it's a <strong>reusable instruction</strong> → Prompt.
+        </p>
+      </div>
+
+      <div class="quiz-box">
+        <p class="quiz-question">
+          An MCP capability that CREATES a calendar event is a...
+        </p>
+        <div class="quiz-options" id="quiz-cap-1">
+          <button onclick="answerQuiz('quiz-cap-1', this, true)" class="quiz-option">
+            A &nbsp;—&nbsp; Tool — it performs an action
+          </button>
+          <button onclick="answerQuiz('quiz-cap-1', this, false)" class="quiz-option">
+            B &nbsp;—&nbsp; Resource — it exposes data
+          </button>
+        </div>
+        <div class="quiz-feedback hidden" id="quiz-cap-1-feedback"></div>
+      </div>
+
+      <div class="quiz-box">
+        <p class="quiz-question">
+          Who decides when a Tool actually gets called?
+        </p>
+        <div class="quiz-options" id="quiz-cap-2">
+          <button onclick="answerQuiz('quiz-cap-2', this, true)" class="quiz-option">
+            A &nbsp;—&nbsp; The model — it reads the description and decides on its own
+          </button>
+          <button onclick="answerQuiz('quiz-cap-2', this, false)" class="quiz-option">
+            B &nbsp;—&nbsp; The user — they must pick it manually every time
+          </button>
+        </div>
+        <div class="quiz-feedback hidden" id="quiz-cap-2-feedback"></div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+      <span>Sheryians Coding School · MCP Server Notes</span>
+      <span>Transport: Streamable HTTP · Port: 3000 · Endpoint: /mcp</span>
+    </footer>
+
+  </main>
+</div>
+
+<script>
+function answerQuiz(quizId, btn, isCorrect) {
+  const container = document.getElementById(quizId);
+  const feedback  = document.getElementById(`${quizId}-feedback`);
+
+  container.querySelectorAll('.quiz-option').forEach(b => {
+    b.disabled = true;
+    b.classList.add('cursor-not-allowed');
+    b.style.opacity = '0.6';
+  });
+
+  if (isCorrect) {
+    btn.classList.add('correct');
+    feedback.textContent = '✓ Correct!';
+    feedback.className = 'quiz-feedback correct';
+  } else {
+    btn.classList.add('incorrect');
+    feedback.textContent = '✗ Not quite — try reviewing that section.';
+    feedback.className = 'quiz-feedback incorrect';
+  }
+}
+
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('.code-pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    const old = btn.textContent;
+    btn.textContent = 'copied ✓';
+    setTimeout(() => { btn.textContent = old; }, 1500);
+  });
+}
+
+// Scrollspy — highlight the nav link of the section in view
+const navLinks = document.querySelectorAll('.nav-link');
+const observed = [...navLinks]
+  .map(l => document.querySelector(l.getAttribute('href')))
+  .filter(Boolean);
+
+const spy = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navLinks.forEach(l => l.classList.remove('active'));
+      const link = document.querySelector(`.nav-link[href="#${e.target.id}"]`);
+      if (link) link.classList.add('active');
+    }
+  });
+}, { rootMargin: '-30% 0px -60% 0px' });
+
+observed.forEach(s => spy.observe(s));
+</script>
+</body>
+</html>
