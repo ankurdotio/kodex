@@ -1,0 +1,47 @@
+@use "sass:math";
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body,
+html {
+    width: 100%;
+    background-color: #1e1e1e;
+}
+
+
+$padding_inline: 2rem;
+$text_color: #fff;
+
+
+@mixin flex-center($direction, $gap: 0rem) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: $direction;
+    gap: $gap;
+}
+
+@function pxToRem($px: 0) {
+    @return $px / 16 * 1rem;
+}
+
+
+body {
+    @include flex-center(row);
+    height: 100vh;
+}
+
+$fontSize: 15px;
+$theme: light;
+
+.box {
+    h1 {
+        font-size: math.div(100px , 30);
+        color: #fff;
+    }
+}

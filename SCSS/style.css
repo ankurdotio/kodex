@@ -1,0 +1,25 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body,
+html {
+  width: 100%;
+  background-color: #1e1e1e;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  gap: 0rem;
+  height: 100vh;
+}
+
+.box h1 {
+  font-size: 3.3333333333px;
+  color: #fff;
+}
